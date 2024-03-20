@@ -1,0 +1,37 @@
+[package]
+name = "axinet"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+boot = { path = "../../boot"}
+mem = { path = "../../mem" } 
+console = { path = "../../console" }
+langitem = { path = "../../langitem"}
+time = { path = "../../time" }
+axi-dma = { path = "../../axi-dma" }
+axi-ethernet = { path = "../../axi-ethernet" }
+log = "0.4"
+spin = "0.9"
+
+[dependencies.smoltcp]
+version = "0.11.0"
+default-features = false
+features = [
+    "alloc", "log",  # no std
+    "medium-ethernet",
+    "proto-ipv4",
+    "_proto-fragmentation",
+    "socket-raw", "socket-icmp", "socket-udp", "socket-tcp", "socket-dns", "socket-dhcpv4",
+    "fragmentation-buffer-size-65536", "proto-ipv4-fragmentation",
+    "reassembly-buffer-size-65536", "reassembly-buffer-count-32",
+    "assembler-max-segment-count-32",
+]
+
+[features]
+poll = []
+smp = []
+
+default = ["poll"]

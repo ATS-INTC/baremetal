@@ -1,0 +1,9 @@
+[submodule "opensbi"]
+	path = opensbi
+	url = https://github.com/ATS-INTC/opensbi.git
+[submodule "axi-dma"]
+	path = axi-dma
+	url = https://github.com/zflcs/axi-dma.git
+[submodule "axi-ethernet"]
+	path = axi-ethernet
+	url = https://github.com/zflcs/axi-ethernet.git

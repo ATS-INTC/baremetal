@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "axi-dma",
+    "axi-ethernet", 
+    "driver-test/axinet", 
+    "boot", "config", "mem", "console", "langitem", "time",
+]
+
+[profile.release]
+lto = true
+
