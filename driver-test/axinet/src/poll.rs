@@ -1,6 +1,5 @@
 use core::ptr::NonNull;
 
-// use smoltcp::phy::{Device, RxToken, TxToken, DeviceCapabilities, Medium};
 use crate::driver::*;
 use alloc::{boxed::Box, vec};
 use axi_dma::BufPtr;
@@ -14,7 +13,7 @@ const MB: usize = 1000 * KB;
 const KB: usize = 1000;
 
 pub(crate) fn poll_transmit() {
-    log::info!("test begin");
+    log::info!("poll test begin");
     bench_transmit_bandwidth();
     // single_transmit();
 }
@@ -23,7 +22,7 @@ pub fn single_transmit() {
     let mut buffer = vec![1u8; MTU].into_boxed_slice();
     let len = buffer.len();
     buffer[..6].copy_from_slice(&[0x00, 0x0A, 0x35, 0x01, 0x05, 0x06]);
-    buffer[6..12].copy_from_slice(&[0x00, 0x0A, 0x35, 0x01, 0x02, 0x04]);
+    buffer[6..12].copy_from_slice(&[0x00, 0x0A, 0x35, 0x01, 0x02, 0x03]);
     buffer[12..14].copy_from_slice(&((MTU - 14) as u16).to_be_bytes());
     let buf_ptr = Box::into_raw(buffer) as *mut _;
     let mut count = 1;
