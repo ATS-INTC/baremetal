@@ -5,7 +5,7 @@ members = [
     "axi-dma",
     "axi-ethernet", 
     "driver-test/axinet", 
-    "boot", "config", "mem", "console", "langitem", "time",
+    "boot", "config", "mem", "console", "langitem", "time", "trap",
 ]
 
 [profile.release]

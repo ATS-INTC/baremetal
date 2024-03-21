@@ -1,7 +1,7 @@
 use alloc::sync::Arc;
 use axi_dma::{AxiDMAResult, AxiDma};
 use axi_ethernet::{AxiEthernet, LinkStatus, XAE_JUMBO_OPTION};
-use spin::{Lazy, Mutex, Once};
+use spin::{Lazy, Mutex};
 
 const DMA_BASE: usize = 0x6010_0000;
 const ETH_BASE: usize = 0x60140000;
@@ -26,13 +26,11 @@ impl Default for AxiNet {
     }
 }
 
-pub static mut AXI_NET: Once<AxiNet> = Once::new();
 pub static AXI_ETH: Lazy<Arc<Mutex<AxiEthernet>>> =
     Lazy::new(|| Arc::new(Mutex::new(AxiEthernet::new(ETH_BASE, DMA_BASE))));
 pub static AXI_DMA: Lazy<Arc<AxiDma>> = Lazy::new(|| Arc::new(AxiDma::default()));
 
 pub fn init() -> AxiDMAResult {
-    unsafe { AXI_NET.call_once(|| AxiNet::default()) };
     /**************** DMA init ***************/
     AXI_DMA.reset()?;
     // enable cyclic mode
