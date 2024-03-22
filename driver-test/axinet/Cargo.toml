@@ -23,6 +23,5 @@ riscv = "0.11.0"
 poll = []
 smp = []
 intr = ["trap"]
-intr_coalesce = ["intr"]
 
 default = []
