@@ -2,7 +2,7 @@ use core::{ptr::NonNull, sync::atomic::{AtomicUsize, Ordering}};
 
 use crate::driver::*;
 use alloc::{boxed::Box, collections::VecDeque, vec};
-use axi_dma::{BufPtr, Transfer};
+use axi_dma::BufPtr;
 use time::Instant;
 
 // const MTU: usize = axi_ethernet::XAE_MAX_JUMBO_FRAME_SIZE;
@@ -15,7 +15,6 @@ const KB: usize = 1000;
 
 static HAS_INTR: AtomicUsize = AtomicUsize::new(0);
 pub(crate) fn intr_transmit() {
-    #[cfg(feature = "intr_coalesce")]
     AXI_DMA.tx_channel.as_ref().unwrap().set_coalesce(THRESHOLD).unwrap();
     trap::plic_init();
     trap::init();
@@ -26,6 +25,7 @@ pub(crate) fn intr_transmit() {
 
 
 /// Test whether the interrupt is normal
+#[allow(unused)]
 pub fn single_transmit() {
     let mut buffer = vec![1u8; MTU].into_boxed_slice();
     let len = buffer.len();

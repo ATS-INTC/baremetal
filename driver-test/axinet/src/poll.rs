@@ -18,6 +18,7 @@ pub(crate) fn poll_transmit() {
     // single_transmit();
 }
 
+#[allow(unused)]
 pub fn single_transmit() {
     let mut buffer = vec![1u8; MTU].into_boxed_slice();
     let len = buffer.len();
