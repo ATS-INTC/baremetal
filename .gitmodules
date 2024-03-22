@@ -7,3 +7,7 @@
 [submodule "axi-ethernet"]
 	path = axi-ethernet
 	url = https://github.com/zflcs/axi-ethernet.git
+[submodule "ats-intc"]
+	path = ats-intc
+	url = https://github.com/ATS-INTC/ats-intc.git
+	branch = axu15eg

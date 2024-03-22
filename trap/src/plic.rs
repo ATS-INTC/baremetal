@@ -37,13 +37,16 @@ pub fn init_hart(hart_id: usize) {
 pub fn intr_dispatch(hart_id: usize, mode: char) {
     let context = get_context(hart_id, mode);
     if let Some(irq) = Plic::claim(context) {
-        unsafe { ext_intr_handler(irq as _); }
+        ext_intr_handler(irq as _);
         Plic::complete(context, irq);
     } else {
         warn!("not get irq");
     }
 }
 
-extern "C" {
-    pub fn ext_intr_handler(irq: usize);
+
+#[linkage = "weak"]
+#[no_mangle]
+fn ext_intr_handler(_irq: usize) -> i32 {
+    panic!("Cannot find ext_intr_handler!");
 }

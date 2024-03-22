@@ -1,5 +1,5 @@
 #![no_std]
-
+#![feature(linkage)]
 #[macro_use]
 extern crate log;
 

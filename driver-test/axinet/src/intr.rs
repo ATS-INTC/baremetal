@@ -99,7 +99,7 @@ pub fn bench_transmit_bandwidth() {
 }
 
 #[no_mangle]
-pub extern "C" fn ext_intr_handler(_irq: usize) {
+pub fn ext_intr_handler(_irq: usize) {
     let _ = AXI_DMA.tx_channel.as_ref().unwrap().intr_handler();
     HAS_INTR.fetch_sub(THRESHOLD, Ordering::Relaxed);
 }

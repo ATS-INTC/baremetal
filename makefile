@@ -18,7 +18,11 @@ OBJDUMP := rust-objdump --arch-name=riscv64
 OBJCOPY := rust-objcopy --binary-architecture=riscv64
 
 build:
+ifdef FEATURES
 	cd $(TEST_DIR)/$(TEST) && LOG=$(LOG) cargo build --$(MODE) --features $(FEATURES)
+else
+	cd $(TEST_DIR)/$(TEST) && LOG=$(LOG) cargo build --$(MODE)
+endif
 	$(OBJCOPY) $(ELF) --strip-all -O binary $(BIN)
 
 disasm: build
