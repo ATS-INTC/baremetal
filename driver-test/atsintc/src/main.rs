@@ -35,14 +35,21 @@ fn simple_push_fetch_test() {
     let task = ATSINTC.ps_fetch();
     assert!(task.is_some());
     log::info!("Fetch {:?} from ATSINTC", task.unwrap());
+    let task = ATSINTC.ps_fetch();
+    assert!(task.is_none());
+    log::info!("Fetch {:?} from ATSINTC", task);
 }
 
 /// 
 fn intr_wake_test() {
-    trap::plic_init();
-    trap::init();
     log::info!("intr_wake_test begin");
-
+    ATSINTC.intr_push(5, unsafe { TaskRef::const_task(0x19990109) });
+    let mut task = ATSINTC.ps_fetch();
+    while task.is_none() { 
+        task = ATSINTC.ps_fetch();
+    }
+    log::info!("Fetch a interrupt handler {:?}", task);
+    log::info!("Fetch {:?} from ATSINTC", ATSINTC.ps_fetch());
 }
 
 /// The basic address of the kernel process

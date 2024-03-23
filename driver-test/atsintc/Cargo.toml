@@ -11,7 +11,6 @@ mem = { path = "../../mem" }
 console = { path = "../../console" }
 langitem = { path = "../../langitem"}
 time = { path = "../../time" }
-trap = { path = "../../trap" }
 ats-intc = { path = "../../ats-intc" }
 
 log = "0.4"
