@@ -85,6 +85,7 @@ dependencies = [
 name = "axinet"
 version = "0.1.0"
 dependencies = [
+ "ats-intc",
  "axi-dma",
  "axi-ethernet",
  "boot",

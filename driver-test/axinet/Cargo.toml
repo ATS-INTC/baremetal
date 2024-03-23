@@ -14,6 +14,7 @@ time = { path = "../../time" }
 axi-dma = { path = "../../axi-dma" }
 axi-ethernet = { path = "../../axi-ethernet" }
 trap = { path = "../../trap", optional = true }
+ats-intc = { path = "../../ats-intc", optional = true }
 
 log = "0.4"
 spin = "0.9"
@@ -23,5 +24,6 @@ riscv = "0.11.0"
 poll = []
 smp = []
 intr = ["trap"]
+atsintc = ["ats-intc", "axi-dma/async"]
 
-default = []
+default = ["atsintc"]

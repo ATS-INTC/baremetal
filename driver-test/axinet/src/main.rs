@@ -13,6 +13,8 @@ mod driver;
 mod poll;
 #[cfg(feature = "intr")]
 mod intr;
+#[cfg(feature = "atsintc")]
+mod atsintc;
 
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
@@ -26,6 +28,8 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     poll::poll_transmit();
     #[cfg(feature = "intr")]
     intr::intr_transmit();
+    #[cfg(feature = "atsintc")]
+    atsintc::atsintc_transmit();
     unreachable!();
 }
 
