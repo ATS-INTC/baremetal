@@ -31,7 +31,7 @@ pub extern "C" fn rust_main_init_other(_hart_id: usize) {
 /// 
 fn simple_push_fetch_test() {
     log::info!("simple_push_fetch_test begin");
-    ATSINTC.ps_push(unsafe { TaskRef::const_task(0x19990109) }, 0);
+    ATSINTC.ps_push(unsafe { TaskRef::virt_task(0x19990109) }, 0);
     let task = ATSINTC.ps_fetch();
     assert!(task.is_some());
     log::info!("Fetch {:?} from ATSINTC", task.unwrap());
@@ -43,7 +43,7 @@ fn simple_push_fetch_test() {
 /// 
 fn intr_wake_test() {
     log::info!("intr_wake_test begin");
-    ATSINTC.intr_push(5, unsafe { TaskRef::const_task(0x19990109) });
+    ATSINTC.intr_push(5, unsafe { TaskRef::virt_task(0x19990109) });
     let mut task = ATSINTC.ps_fetch();
     while task.is_none() { 
         task = ATSINTC.ps_fetch();
