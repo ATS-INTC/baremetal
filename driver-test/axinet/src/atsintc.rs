@@ -22,6 +22,7 @@ const ATSINTC_BASEADDR: usize = 0x1000_0000;
 static ATSINTC: AtsIntc = AtsIntc::new(ATSINTC_BASEADDR);
 
 pub(crate) fn atsintc_transmit() {
+    AXI_DMA.tx_channel.as_ref().unwrap().set_coalesce(THRESHOLD).unwrap();
     log::info!("atsintc test begin");
     // bench_transmit_bandwidth();
     single_transmit();
@@ -53,13 +54,13 @@ pub fn single_transmit() {
     // Push a transmit task into the ATSINTC
     ATSINTC.ps_push(task_ref, 0);
     loop {
-        if let Some(task_ref) = ATSINTC.ps_fetch() {
-            let task = Task::from_ref(task_ref);
-            task.poll_inner();
+        if let Some(task) = ATSINTC.ps_fetch() {
+            log::trace!("Fetch {:?}", task);
+            task.poll();
         }
-        if HAS_INTR.load(Ordering::Relaxed) == 0 { 
-            break;
-        } 
+        // if HAS_INTR.load(Ordering::Relaxed) == 0 { 
+        //     break;
+        // } 
     }
     log::info!("single_transmit ok");
 }
@@ -109,6 +110,14 @@ async fn transmit(buf: BufPtr) -> i32 {
 async fn ext_intr_handler() -> i32 {
     log::trace!("ext_intr_handler has been waked.");
     let _ = AXI_DMA.tx_channel.as_ref().unwrap().intr_handler();
+    let mut count = THRESHOLD;
+    while count > 0 {
+        if let Some(waker) = AXI_DMA.tx_channel.as_ref().unwrap().wakers.lock().pop_front() {
+            log::trace!("waker {:?}", waker);
+            waker.wake();
+        }
+        count -= 1;
+    }
     HAS_INTR.fetch_sub(THRESHOLD, Ordering::Relaxed);
     0
 }
