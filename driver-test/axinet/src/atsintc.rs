@@ -1,14 +1,14 @@
 use core::{future::Future, pin::Pin, ptr::NonNull, task::{Context, Poll}};
 
 use crate::driver::*;
-use alloc::{boxed::Box, vec};
+use alloc::{boxed::Box, collections::VecDeque, vec};
 use axi_dma::BufPtr;
 use time::Instant;
 use ats_intc::*;
 
 // const MTU: usize = axi_ethernet::XAE_MAX_JUMBO_FRAME_SIZE;
-const MTU: usize = 7000;
-const THRESHOLD: usize =  1;
+const MTU: usize = 2000;
+const THRESHOLD: usize = 1;
 
 const GB: usize = 1000 * MB;
 const MB: usize = 1000 * KB;
@@ -22,7 +22,7 @@ static ATSINTC: AtsIntc = AtsIntc::new(ATSINTC_BASEADDR);
 pub(crate) fn atsintc_transmit() {
     AXI_DMA.tx_channel.as_ref().unwrap().set_coalesce(THRESHOLD).unwrap();
     log::info!("atsintc test begin");
-    transmit_one_by_one();
+    bench_transmit_bandwidth();
     single_transmit();
 }
 
@@ -61,7 +61,7 @@ pub fn single_transmit() {
     log::info!("single_transmit ok");
 }
 
-pub fn transmit_one_by_one() {
+pub fn bench_transmit_bandwidth() {
     let mut buffer = vec![1u8; MTU].into_boxed_slice();
     let len = buffer.len();
     buffer[..6].copy_from_slice(&[0x00, 0x0A, 0x35, 0x01, 0x05, 0x06]);
@@ -70,7 +70,7 @@ pub fn transmit_one_by_one() {
     let buf_ptr = Box::into_raw(buffer) as *mut _;
 
     let task_ref = Task::new(
-        Box::pin(transmit_bench_one_by_one(BufPtr::new(NonNull::new(buf_ptr).unwrap(), len))), 
+        Box::pin(transmit_bench_threshole(BufPtr::new(NonNull::new(buf_ptr).unwrap(), len))), 
         0, 
         TaskType::Other, 
         &ATSINTC
@@ -92,22 +92,38 @@ pub fn transmit_one_by_one() {
             }
         }
     }
-    log::info!("transmit_bench_one_by_one ok");
+    log::info!("bench_transmit_bandwidth ok");
 }
 
 async fn transmit(buf: BufPtr) -> i32 {
-    let _ = AXI_DMA.tx_submit(buf).unwrap().await;
+    let mut transfers = VecDeque::new();
+    for _ in 0..THRESHOLD {
+        let transfer = AXI_DMA.tx_submit(buf.clone()).unwrap();
+        transfers.push_back(transfer);
+    }
+    if let Some(transfer) = transfers.pop_front() {
+        transfer.await;   
+    }
+    transfers.clear();
     0
 }
 
-async fn transmit_bench_one_by_one(buf: BufPtr) -> i32 {
+async fn transmit_bench_threshole(buf: BufPtr) -> i32 {
     const MAX_SEND_BYTES: usize = 10 * GB;
     let mut send_bytes: usize = 0;
     let mut past_send_bytes: usize = 0;
     let mut past_time = Instant::now();
+    let mut transfers = VecDeque::new();
     while send_bytes < MAX_SEND_BYTES {
-        let _ = AXI_DMA.tx_submit(buf.clone()).unwrap().await;
-        send_bytes += MTU;
+        for _ in 0..THRESHOLD {
+            let transfer = AXI_DMA.tx_submit(buf.clone()).unwrap();
+            transfers.push_back(transfer);
+        }
+        if let Some(transfer) = transfers.pop_front() {
+            transfer.await;   
+        }
+        transfers.clear();
+        send_bytes += MTU * THRESHOLD;
         if past_time.elapsed().as_secs() == 1 {
             let gb = ((send_bytes - past_send_bytes) * 8) / GB;
             let mb = (((send_bytes - past_send_bytes) * 8) % GB) / MB;
