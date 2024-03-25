@@ -7,8 +7,7 @@ We will conduct four test:
 
 - [x] Poll mode.
 - [x] Interrupt mode.
-- [ ] Interrupt mode + Rust Future.
-- [ ] Rust Future + ATSINTC.
+- [x] Rust Future + ATSINTC.
 
 ## Poll mode
 
@@ -74,4 +73,38 @@ The test result is shown below:
 | 10000                      | 0.997  | 0.997  | 0.997  | 0.997  | 0.997  |
 | 16128                      | 0.998  | 0.998  | 0.998  | 0.998  | 0.998  |
 
-## Interrupt mode + Rust Future
+## Rust Future + ATSINTC
+
+The `ATSINTC` is the a interrupt controller integrated with asynchonrous task scheduling. When an interrupt occur, it will directly wake the interrupt handler task without breaking the execution of CPU.
+
+### Transmit package one by one
+
+This test case is the same as before, we will send package one by one. But we use the Rust `Future` and `ATSINTC`. The execution change is under the help of Rust compiler while the notification mechanism is provided by `ATSINTC`.
+
+| Frame size(byte) | Throughput(Gbits/sec) |
+| ---------------- | --------------------- |
+| 60               | 0.035                 |
+| 64               | 0.037                 |
+| 128              | 0.075                 |
+| 256              | 0.103                 |
+| 512              | 0.195                 |
+| 1000             | 0.336                 |
+| 1024             | 0.346                 |
+| 1514             | 0.456                 |
+| 2000             | 0.557                 |
+| 2048             | 0.564                 |
+| 3000             | 0.702                 |
+| 4000             | 0.824                 |
+| 4096             | 0.824                 |
+| 4500             | 0.864                 |
+| 5000             | 0.910                 |
+| 6000             | 0.977                 |
+| 7000             | 0.996                 |
+| 8000             | 0.996                 |
+| 8192             | 0.996                 |
+| 9000             | 0.997                 |
+| 10000            | 0.997                 |
+| 16128            | 0.998                 |
+
+### Bulk transmit package
+

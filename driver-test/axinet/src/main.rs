@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(waker_getters)]
 #![no_main]
 
 extern crate alloc;
