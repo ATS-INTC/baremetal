@@ -9,6 +9,8 @@ We will conduct four test:
 - [x] Interrupt mode.
 - [x] Rust Future + ATSINTC.
 
+The comparation can be seen in the [assets](./assets/) directory.
+
 ## Poll mode
 
 In this case, we create a buffer and submit it to the AxiNic. Then we wait the transmition to be finished by checking the AXI DMA interrupt status register. We won't submit the next buffer until the previous transmition has been completed. The test result is shown below:
