@@ -26,4 +26,4 @@ smp = []
 intr = ["trap"]
 atsintc = ["ats-intc", "axi-dma/async"]
 
-default = []
+default = ["poll"]
