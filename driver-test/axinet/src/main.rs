@@ -10,12 +10,11 @@ extern crate mem;
 extern crate trap;
 
 mod driver;
-#[cfg(feature = "poll")]
-mod poll;
-#[cfg(feature = "intr")]
-mod intr;
-#[cfg(feature = "atsintc")]
-mod atsintc;
+#[cfg(any(feature = "simple_poll", feature = "simple_intr", feature = "simple_atsintc"))]
+mod simple_transmit_test;
+
+#[cfg(any(feature = "bulk_poll", feature = "bulk_intr", feature = "bulk_atsintc"))]
+mod bulk_receive_test;
 
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
@@ -25,12 +24,10 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     let _ = driver::init().map_err(|e| panic!("Error {:?} occurred!", e));
     #[cfg(feature = "smp")]
     boot::boot_other(_hart_id);
-    #[cfg(feature = "poll")]
-    poll::poll_transmit();
-    #[cfg(feature = "intr")]
-    intr::intr_transmit();
-    #[cfg(feature = "atsintc")]
-    atsintc::atsintc_transmit();
+    #[cfg(any(feature = "simple_poll", feature = "simple_intr", feature = "simple_atsintc"))]
+    simple_transmit_test::simple_transmit_test();
+    #[cfg(any(feature = "bulk_poll", feature = "bulk_intr", feature = "bulk_atsintc"))]
+    bulk_receive_test::bulk_receive_test();
     unreachable!();
 }
 

@@ -1,6 +1,6 @@
 use alloc::sync::Arc;
 use axi_dma::{AxiDMAResult, AxiDma};
-use axi_ethernet::{AxiEthernet, LinkStatus, XAE_JUMBO_OPTION};
+use axi_ethernet::{AxiEthernet, LinkStatus, XAE_BROADCAST_OPTION, XAE_JUMBO_OPTION};
 use spin::{Lazy, Mutex};
 
 const DMA_BASE: usize = 0x6010_0000;
@@ -46,6 +46,7 @@ pub fn init() -> AxiDMAResult {
     eth.reset();
     let options = eth.get_options();
     eth.set_options(options | XAE_JUMBO_OPTION);
+    eth.clear_options(XAE_BROADCAST_OPTION);
     eth.detect_phy();
     let speed = eth.get_phy_speed_ksz9031();
     eth.set_operating_speed(speed as u16);
