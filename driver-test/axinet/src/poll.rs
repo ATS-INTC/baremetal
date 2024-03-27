@@ -79,9 +79,9 @@ fn transmit_submit_cycle_test(buf: BufPtr) {
 
     // Send bytes
     while send_bytes < MAX_SEND_BYTES {
-        let mut start = riscv::register::cycle::read();
+        let start = riscv::register::cycle::read();
         let _ = AXI_DMA.tx_submit(buf.clone()).unwrap().wait().unwrap();
-        let mut end = riscv::register::cycle::read();
+        let end = riscv::register::cycle::read();
         // transfer.wait().unwrap();
         total_cycle.push(end - start);
         send_bytes += MTU;
