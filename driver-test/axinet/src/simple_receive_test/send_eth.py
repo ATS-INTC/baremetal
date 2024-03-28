@@ -150,7 +150,7 @@ def parse_arguments():
         '-d',
         '--data',
         dest='data',
-        default='a' * (9000 - 14),
+        default='a' * (64 - 14),
         required=False,
     )
     # Argument: protocol type

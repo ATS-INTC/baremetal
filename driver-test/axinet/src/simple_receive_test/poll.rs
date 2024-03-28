@@ -10,7 +10,7 @@ use time::Instant;
 
 
 // const MTU: usize = axi_ethernet::XAE_MAX_JUMBO_FRAME_SIZE;
-const MTU: usize = 9000;
+const MTU: usize = 64;
 
 const GB: usize = 1000 * MB;
 const MB: usize = 1000 * KB;
@@ -102,26 +102,17 @@ fn bulk_receive() {
     let buf_ptr = Box::into_raw(buffer) as *mut _;
     let buf = BufPtr::new(NonNull::new(buf_ptr).unwrap(), len);
 
-    const MAX_RECV_BYTES: usize = 2000 * MB;
+    const MAX_RECV_BYTES: usize = 10 * MB;
     let mut recv_bytes: usize = 0;
     let mut past_recv_bytes: usize = 0;
     let mut past_time = Instant::now();
     let mut total_cycle = Vec::new();
-    let mut wait_cycle = Vec::new();
 
     // Send bytes
     while recv_bytes < MAX_RECV_BYTES {
         if AXI_ETH.lock().can_receive() {
-            let transfer = AXI_DMA.rx_submit(buf.clone()).unwrap();
-            
             let start = riscv::register::cycle::read();
-            while !AXI_DMA.rx_channel.as_ref().unwrap().check_cmplt() { }
-            let end = riscv::register::cycle::read();
-            wait_cycle.push(end - start);
-
-            let start = riscv::register::cycle::read();
-            AXI_DMA.rx_channel.as_ref().unwrap().intr_handler();
-            transfer.recycle();
+            let _ = AXI_DMA.rx_submit(buf.clone()).unwrap().wait().unwrap();
             let end = riscv::register::cycle::read();
             total_cycle.push(end - start);
 
@@ -145,12 +136,6 @@ fn bulk_receive() {
         }
         
     }
-    let len = wait_cycle.len();
-    let mut count = 0;
-    for c in wait_cycle {
-        count += c;
-    }
-    log::info!("wait {}, avarage cycle: {}", len, count / len);
     let len = total_cycle.len();
     let mut count = 0;
     for c in total_cycle {
