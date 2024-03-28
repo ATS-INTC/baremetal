@@ -26,12 +26,12 @@ embassy-net-driver = {version = "0.2.0", optional = true }
 
 smp = []
 
-simple_poll = []
-simple_intr = ["trap"]
-simple_atsintc = ["ats-intc", "axi-dma/async"]
+simple_transmit_poll = []
+simple_transmit_intr = ["trap"]
+simple_transmit_atsintc = ["ats-intc", "axi-dma/async"]
 
-bulk_poll = []
-bulk_intr = ["trap"]
-bulk_atsintc = ["ats-intc", "axi-dma/async"]
+simple_receive_poll = []
+simple_receive_intr = ["trap"]
+simple_receive_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["bulk_poll"]
+default = ["simple_receive_poll"]

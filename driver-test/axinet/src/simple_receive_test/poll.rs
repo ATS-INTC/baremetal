@@ -8,8 +8,6 @@ use alloc::{boxed::Box, vec, vec::Vec};
 use axi_dma::BufPtr;
 use time::Instant;
 
-use pnet::packet::{Packet, MutablePacket};
-use pnet::packet::ethernet::{EthernetPacket, MutableEthernetPacket};
 
 // const MTU: usize = axi_ethernet::XAE_MAX_JUMBO_FRAME_SIZE;
 const MTU: usize = 9000;
@@ -93,8 +91,6 @@ fn single_receive() {
     let buf_ptr = rbuf.as_mut_ptr();
     let slice = unsafe { core::slice::from_raw_parts_mut(buf_ptr, buf.len()) };
     let box_buf = unsafe { Box::from_raw(slice) };
-    let a = EthernetPacket::new(&box_buf).unwrap();
-    log::info!("{:X?}", a.payload());
     log::info!("single receive ok");
 }
 
