@@ -1,7 +1,7 @@
 #[cfg(feature = "bulk_poll")]
 mod poll;
 
-pub(crate) fn bulk_receive_test() {
+pub(crate) fn bulk_test() {
     #[cfg(feature = "bulk_poll")]
-    poll::poll_receive();
+    poll::poll_test();
 }

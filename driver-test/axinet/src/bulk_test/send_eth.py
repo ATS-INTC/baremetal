@@ -15,6 +15,8 @@ Changelog:
 
 import base64
 import struct
+import time
+import threading
 
 from argparse import (
     ArgumentParser,
@@ -110,7 +112,9 @@ def send_ether(iface, to, _type, data, s=None):
     frame = header + data
 
     # send the ethernet frame
-    s.send(frame)
+    while True:
+        s.send(frame)
+        time.sleep(0.000000001)
 
 
 def parse_arguments():
@@ -146,7 +150,7 @@ def parse_arguments():
         '-d',
         '--data',
         dest='data',
-        default='a' * 46,
+        default='a' * (9000 - 14),
         required=False,
     )
     # Argument: protocol type
@@ -173,12 +177,24 @@ def main():
     args = parse_arguments()
 
     # send ethernet frame according to given arguments
-    send_ether(
-        iface=args.iface,
-        to=args.to,
-        _type=eval(args._type),
-        data=args.data,
-    )
+    threads = []
+    for _ in range(1):  # 循环创建10个线程
+        t = threading.Thread(target=send_ether(
+            iface=args.iface,
+            to=args.to,
+            _type=eval(args._type),
+            data=args.data,
+        ))
+        threads.append(t)
+    for t in threads:  # 循环启动10个线程
+        t.start()
+    # send_ether(
+    #     iface=args.iface,
+    #     to=args.to,
+    #     _type=eval(args._type),
+    #     data=args.data,
+    # )
+        
 
 if __name__ == '__main__':
     main()

@@ -14,7 +14,7 @@ mod driver;
 mod simple_transmit_test;
 
 #[cfg(any(feature = "bulk_poll", feature = "bulk_intr", feature = "bulk_atsintc"))]
-mod bulk_receive_test;
+mod bulk_test;
 
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
@@ -27,7 +27,7 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     #[cfg(any(feature = "simple_poll", feature = "simple_intr", feature = "simple_atsintc"))]
     simple_transmit_test::simple_transmit_test();
     #[cfg(any(feature = "bulk_poll", feature = "bulk_intr", feature = "bulk_atsintc"))]
-    bulk_receive_test::bulk_receive_test();
+    bulk_test::bulk_test();
     unreachable!();
 }
 

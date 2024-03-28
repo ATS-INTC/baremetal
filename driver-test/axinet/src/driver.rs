@@ -5,7 +5,7 @@ use spin::{Lazy, Mutex};
 
 const DMA_BASE: usize = 0x6010_0000;
 const ETH_BASE: usize = 0x60140000;
-const BD_CNT: usize = 1024;
+const BD_CNT: usize = 32;
 const MAC_ADDR: [u8; 6] = [0x00, 0x0A, 0x35, 0x01, 0x02, 0x03];
 
 #[derive(Clone)]
@@ -57,11 +57,16 @@ pub fn init() -> AxiDMAResult {
     }
     eth.set_mac_address(&MAC_ADDR);
     eth.enable_rx_memovr();
+    eth.clear_rx_memovr();
     eth.enable_rx_rject();
+    eth.clear_rx_rject();
     eth.enable_rx_cmplt();
+    eth.clear_rx_cmplt();
     eth.enable_tx_cmplt();
     eth.clear_tx_cmplt();
     eth.start();
     log::info!("NIC initialization has done!");
     Ok(())
 }
+
+
