@@ -150,7 +150,7 @@ def parse_arguments():
         '-d',
         '--data',
         dest='data',
-        default='a' * (64 - 14),
+        default='a' * (9000 - 14),
         required=False,
     )
     # Argument: protocol type
@@ -178,7 +178,7 @@ def main():
 
     # send ethernet frame according to given arguments
     threads = []
-    for _ in range(1):  # 循环创建10个线程
+    for _ in range(10):  # 循环创建10个线程
         t = threading.Thread(target=send_ether(
             iface=args.iface,
             to=args.to,

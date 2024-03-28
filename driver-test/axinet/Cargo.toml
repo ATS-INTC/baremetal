@@ -34,4 +34,8 @@ simple_receive_poll = []
 simple_receive_intr = ["trap"]
 simple_receive_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["simple_receive_poll"]
+single_loop_poll = []
+single_loop_intr = []
+single_loop_atsintc = []
+
+default = ["simple_receive_atsintc"]

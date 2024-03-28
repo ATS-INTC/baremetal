@@ -6,7 +6,7 @@ use axi_dma::BufPtr;
 use time::Instant;
 
 // const MTU: usize = axi_ethernet::XAE_MAX_JUMBO_FRAME_SIZE;
-const MTU: usize = 128;
+const MTU: usize = 9000;
 const THRESHOLD: usize = 1;
 
 const GB: usize = 1000 * MB;
@@ -56,7 +56,7 @@ fn single_receive(buf: BufPtr) {
 #[allow(unused)]
 fn bulk_receive(buf: BufPtr) {
     // 10 Gb
-    const MAX_RECV_BYTES: usize = 20 * MB;
+    const MAX_RECV_BYTES: usize = 1000 * MB;
     let mut recv_bytes: usize = 0;
     let mut past_recv_bytes: usize = 0;
     let mut past_time = Instant::now();
@@ -65,32 +65,34 @@ fn bulk_receive(buf: BufPtr) {
     let mut intr_recycle_cycle = Vec::new();
     // Send bytes
     while recv_bytes < MAX_RECV_BYTES {
-        let start1 = riscv::register::cycle::read();
-        HAS_INTR.fetch_add(THRESHOLD, Ordering::Relaxed);
-        let transfer = AXI_DMA.rx_submit(buf.clone()).unwrap();
-        let start2 = riscv::register::cycle::read();
-        while HAS_INTR.load(Ordering::Relaxed) > 0 {
-        }
-        transfer.recycle().unwrap();
-        let end = riscv::register::cycle::read();
-        total_cycle.push(end - start1);
-        intr_recycle_cycle.push(end - start2);
-        recv_bytes += MTU * THRESHOLD;
-        if past_time.elapsed().as_secs() == 1 {
-            let gb = ((recv_bytes - past_recv_bytes) * 8) / GB;
-            let mb = (((recv_bytes - past_recv_bytes) * 8) % GB) / MB;
-            let gib = (recv_bytes - past_recv_bytes) / GB;
-            let mib = ((recv_bytes - past_recv_bytes) % GB) / MB;
-            log::info!(
-                "Receive: {}.{:03}GBytes, Bandwidth: {}.{:03}Gbits/{}sec.",
-                gib,
-                mib,
-                gb,
-                mb,
-                past_time.elapsed().as_secs()
-            );
-            past_recv_bytes = recv_bytes;
-            past_time = Instant::now();
+        if AXI_ETH.lock().can_receive() {
+            let start1 = riscv::register::cycle::read();
+            HAS_INTR.fetch_add(THRESHOLD, Ordering::Relaxed);
+            let transfer = AXI_DMA.rx_submit(buf.clone()).unwrap();
+            let start2 = riscv::register::cycle::read();
+            while HAS_INTR.load(Ordering::Relaxed) > 0 {
+            }
+            transfer.recycle().unwrap();
+            let end = riscv::register::cycle::read();
+            total_cycle.push(end - start1);
+            intr_recycle_cycle.push(end - start2);
+            recv_bytes += MTU * THRESHOLD;
+            if past_time.elapsed().as_secs() == 1 {
+                let gb = ((recv_bytes - past_recv_bytes) * 8) / GB;
+                let mb = (((recv_bytes - past_recv_bytes) * 8) % GB) / MB;
+                let gib = (recv_bytes - past_recv_bytes) / GB;
+                let mib = ((recv_bytes - past_recv_bytes) % GB) / MB;
+                log::info!(
+                    "Receive: {}.{:03}GBytes, Bandwidth: {}.{:03}Gbits/{}sec.",
+                    gib,
+                    mib,
+                    gb,
+                    mb,
+                    past_time.elapsed().as_secs()
+                );
+                past_recv_bytes = recv_bytes;
+                past_time = Instant::now();
+            }
         }
     }
     let len = total_cycle.len();

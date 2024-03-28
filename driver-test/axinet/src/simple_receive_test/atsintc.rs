@@ -8,7 +8,7 @@ use ats_intc::*;
 use alloc::vec::Vec;
 
 // const MTU: usize = axi_ethernet::XAE_MAX_JUMBO_FRAME_SIZE;
-const MTU: usize = 128;
+const MTU: usize = 9000;
 const THRESHOLD: usize = 1;
 
 const GB: usize = 1000 * MB;
@@ -84,31 +84,33 @@ fn bulk_receive_test(buf: BufPtr) {
 
 #[allow(unused)]
 async fn bulk_receive(buf: BufPtr) -> i32 {
-    const MAX_RECV_BYTES: usize = 50 * MB;
+    const MAX_RECV_BYTES: usize = 1000 * MB;
     let mut recv_bytes: usize = 0;
     let mut past_recv_bytes: usize = 0;
     let mut past_time = Instant::now();
     let mut total_cycle = Vec::new();
     while recv_bytes < MAX_RECV_BYTES {
-        let start = riscv::register::cycle::read();
-        let transfer = AXI_DMA.rx_submit(buf.clone()).unwrap().await;
-        let end = riscv::register::cycle::read();
-        total_cycle.push(end - start);
-        recv_bytes += MTU;
-        if past_time.elapsed().as_secs() == 1 {
-            let gb = ((recv_bytes - past_recv_bytes) * 8) / GB;
-            let mb = (((recv_bytes - past_recv_bytes) * 8) % GB) / MB;
-            let gib = (recv_bytes - past_recv_bytes) / GB;
-            let mib = ((recv_bytes - past_recv_bytes) % GB) / MB;
-            log::info!(
-                "Transmit: {}.{:03}GBytes, Bandwidth: {}.{:03}Gbits/sec.",
-                gib,
-                mib,
-                gb,
-                mb
-            );
-            past_recv_bytes = recv_bytes;
-            past_time = Instant::now();
+        if AXI_ETH.lock().can_receive() {
+            let start = riscv::register::cycle::read();
+            let transfer = AXI_DMA.rx_submit(buf.clone()).unwrap().await;
+            let end = riscv::register::cycle::read();
+            total_cycle.push(end - start);
+            recv_bytes += MTU;
+            if past_time.elapsed().as_secs() == 1 {
+                let gb = ((recv_bytes - past_recv_bytes) * 8) / GB;
+                let mb = (((recv_bytes - past_recv_bytes) * 8) % GB) / MB;
+                let gib = (recv_bytes - past_recv_bytes) / GB;
+                let mib = ((recv_bytes - past_recv_bytes) % GB) / MB;
+                log::info!(
+                    "Transmit: {}.{:03}GBytes, Bandwidth: {}.{:03}Gbits/sec.",
+                    gib,
+                    mib,
+                    gb,
+                    mb
+                );
+                past_recv_bytes = recv_bytes;
+                past_time = Instant::now();
+            }
         }
     }
     let len = total_cycle.len();
