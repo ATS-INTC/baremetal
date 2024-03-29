@@ -14,15 +14,19 @@ use axi_dma::BufPtr;
 use pnet::packet::{ethernet::MutableEthernetPacket, Packet};
 use crate::driver::AXI_DMA;
 
-const MTU: usize = 60;
+static mut MTU: usize = 0;
 
 const GB: usize = 1000 * MB;
 const MB: usize = 1000 * KB;
 const KB: usize = 1000;
 
 pub fn poll_test() {
+    unsafe { MTU = match option_env!("MTU") {
+        Some(s) => s.parse::<usize>().unwrap(),
+        None => panic!("MTU is not specificed"),
+    } };
     log::info!("poll_test begin");
-    let buffer = vec![0u8; MTU].into_boxed_slice();
+    let buffer = vec![0u8; unsafe {MTU}].into_boxed_slice();
     let len = buffer.len();
     let buf_ptr = Box::into_raw(buffer) as *mut _;
     let buf = BufPtr::new(NonNull::new(buf_ptr).unwrap(), len);
