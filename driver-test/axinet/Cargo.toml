@@ -38,4 +38,4 @@ single_loop_poll = []
 single_loop_intr = []
 single_loop_atsintc = []
 
-default = ["simple_receive_atsintc"]
+default = ["single_loop_poll"]
