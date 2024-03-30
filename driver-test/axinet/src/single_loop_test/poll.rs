@@ -1,5 +1,3 @@
-use core::ptr::NonNull;
-
 /// In this test, we will build a connect with PC.
 /// PC will send a raw Ethernet packet, then this test will receive it and send it back to PC after processing it.
 /// We will measure the CPU cycles of each phase in the connect.
@@ -9,16 +7,13 @@ use core::ptr::NonNull;
 /// The server receives the packet, calculates and sends response to PC.
 /// 
 
+use core::ptr::NonNull;
 use alloc::{boxed::Box, vec};
 use axi_dma::BufPtr;
-use pnet::packet::{ethernet::MutableEthernetPacket, Packet};
+use pnet::packet::ethernet::MutableEthernetPacket;
 use crate::driver::AXI_DMA;
 
 static mut MTU: usize = 0;
-
-const GB: usize = 1000 * MB;
-const MB: usize = 1000 * KB;
-const KB: usize = 1000;
 
 pub fn poll_test() {
     unsafe { MTU = match option_env!("MTU") {

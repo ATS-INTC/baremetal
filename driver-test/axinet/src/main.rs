@@ -10,7 +10,7 @@ extern crate mem;
 extern crate trap;
 
 mod driver;
-#[cfg(any(feature = "simple_poll", feature = "simple_intr", feature = "simple_atsintc"))]
+#[cfg(any(feature = "simple_transmit_poll", feature = "simple_transmit_intr", feature = "simple_transmit_atsintc"))]
 mod simple_transmit_test;
 
 #[cfg(any(feature = "simple_receive_poll", feature = "simple_receive_intr", feature = "simple_receive_atsintc"))]
@@ -27,7 +27,7 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     let _ = driver::init().map_err(|e| panic!("Error {:?} occurred!", e));
     #[cfg(feature = "smp")]
     boot::boot_other(_hart_id);
-    #[cfg(any(feature = "simple_poll", feature = "simple_intr", feature = "simple_atsintc"))]
+    #[cfg(any(feature = "simple_transmit_poll", feature = "simple_transmit_intr", feature = "simple_transmit_atsintc"))]
     simple_transmit_test::simple_transmit_test();
     #[cfg(any(feature = "simple_receive_poll", feature = "simple_receive_intr", feature = "simple_receive_atsintc"))]
     simple_receive_test::simple_receive_test();

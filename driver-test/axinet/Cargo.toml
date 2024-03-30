@@ -35,7 +35,7 @@ simple_receive_intr = ["trap"]
 simple_receive_atsintc = ["ats-intc", "axi-dma/async"]
 
 single_loop_poll = []
-single_loop_intr = []
-single_loop_atsintc = []
+single_loop_intr = ["trap"]
+single_loop_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["single_loop_poll"]
+default = ["single_loop_intr"]
