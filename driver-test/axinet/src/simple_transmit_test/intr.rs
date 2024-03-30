@@ -93,8 +93,11 @@ pub fn bench_transmit_bandwidth(buf: BufPtr) {
     }
 }
 
+static mut INTR_LATENCY: Vec<usize> = Vec::new();
 #[no_mangle]
 pub fn ext_intr_handler(_irq: usize) {
+    let intr_end = riscv::register::cycle::read();
+    unsafe { INTR_LATENCY.push(intr_end - trap::INTR_START); }
     let _ = AXI_DMA.tx_channel.as_ref().unwrap().intr_handler();
     HAS_INTR.fetch_sub(THRESHOLD, Ordering::Relaxed);
 }
@@ -141,4 +144,7 @@ pub fn transmit_cycle_test(buf: BufPtr) {
         count += c;
     }
     log::info!("total submit {}, avarage cycle: {}", len, count / len);
+    log::info!("total interrupt latency {:?}", unsafe {
+        &INTR_LATENCY
+    });
 }
