@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 
+use alloc::vec::Vec;
 use ats_intc::*;
 
 extern crate alloc;
@@ -18,7 +19,7 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     #[cfg(feature = "smp")]
     boot::boot_other(_hart_id);
     simple_push_fetch_test();
-    intr_wake_test();
+    // intr_wake_test();
     unreachable!();
 }
 
@@ -30,14 +31,44 @@ pub extern "C" fn rust_main_init_other(_hart_id: usize) {
 
 /// 
 fn simple_push_fetch_test() {
-    log::info!("simple_push_fetch_test begin");
-    ATSINTC.ps_push(unsafe { TaskRef::virt_task(0x19990109) }, 0);
-    let task = ATSINTC.ps_fetch();
-    assert!(task.is_some());
-    log::info!("Fetch {:?} from ATSINTC", task.unwrap());
-    let task = ATSINTC.ps_fetch();
-    assert!(task.is_none());
-    log::info!("Fetch {:?} from ATSINTC", task);
+    let mut count = 10000;
+    let mut push_cycle = Vec::new();
+    let mut fetch_cycle = Vec::new();
+
+    while count > 0 {
+        // log::info!("simple_push_fetch_test begin");
+        let start = riscv::register::cycle::read();
+        ATSINTC.ps_push(unsafe { TaskRef::virt_task(0x19990109) }, 0);
+        let end = riscv::register::cycle::read();
+        push_cycle.push(end - start);
+        // log::info!("push cycle {}", end - start);
+        let start = riscv::register::cycle::read();
+        let task = ATSINTC.ps_fetch();
+        let end = riscv::register::cycle::read();
+        fetch_cycle.push(end - start);
+
+        // log::info!("fetch cycle {}", end - start);
+        assert!(task.is_some());
+        // log::info!("Fetch {:?} from ATSINTC", task.unwrap());
+        let task = ATSINTC.ps_fetch();
+        assert!(task.is_none());
+        // log::info!("Fetch {:?} from ATSINTC", task);
+        count -= 1;
+    }
+    let mut total = 0;
+    for c in &push_cycle {
+        total += *c;
+    }
+    log::info!("avarage push cycel {}", total / push_cycle.len());
+    // log::info!("push cycel {:?}", push_cycle);
+    let mut total = 0;
+    for c in &fetch_cycle {
+        total += *c;
+    }
+    log::info!("avarage fetch cycel {}", total / fetch_cycle.len());
+    // log::info!("fetch cycel {:?}", fetch_cycle);
+
+    
 }
 
 /// 
