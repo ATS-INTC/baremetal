@@ -7,7 +7,15 @@ use ats_intc::*;
 use pnet::packet::ethernet::MutableEthernetPacket;
 
 static mut MTU: usize = 0;
-
+#[cfg(feature = "calculate")]
+static mut SCALE: usize = 0;
+#[cfg(feature = "calculate")]
+use {
+    crate::{gen_matrix, matrix_multiply, Matrix},
+    spin::Once,
+};
+#[cfg(feature = "calculate")]
+static MATRIX: Once<Matrix> = Once::new();
 
 /// The basic address of the kernel process
 const ATSINTC_BASEADDR: usize = 0x1000_0000;
@@ -19,6 +27,14 @@ pub fn atsintc_test() {
         Some(s) => s.parse::<usize>().unwrap(),
         None => panic!("MTU is not specificed"),
     } };
+    #[cfg(feature = "calculate")]
+    {
+        unsafe { SCALE = match option_env!("SCALE") {
+            Some(s) => s.parse::<usize>().unwrap(),
+            None => panic!("SCALE is not specificed"),
+        } };
+        MATRIX.call_once(|| gen_matrix(unsafe { SCALE }));
+    }
     log::info!("atsintc_test begin");
     let buffer = vec![0u8; unsafe {MTU}].into_boxed_slice();
     let len = buffer.len();
@@ -47,6 +63,10 @@ fn server(buf: BufPtr) {
             let _ = task.clone().poll();
             if flag {
                 ATSINTC.intr_push(4, task);
+                #[cfg(feature = "calculate")]
+                {
+                    let _ = matrix_multiply(MATRIX.get().unwrap(), MATRIX.get().unwrap());
+                }
             } else {
                 ATSINTC.intr_push(3, task);
             }
@@ -95,3 +115,25 @@ impl core::future::Future for ReceiveHelper {
         core::task::Poll::Ready(0)
     }
 }
+
+// #[cfg(feature = "calculate")]
+// async fn calculate() -> i32 {
+//     loop {
+//         let _ = matrix_multiply(MATRIX.get().unwrap(), MATRIX.get().unwrap());
+//     }
+// }
+
+// #[cfg(feature = "calculate")]
+// struct CalculateHelper;
+
+// #[cfg(feature = "calculate")]
+// impl core::future::Future for CalculateHelper {
+//     type Output = i32;
+
+//     fn poll(self: core::pin::Pin<&mut Self>, cx: &mut core::task::Context<'_>) -> core::task::Poll<Self::Output> {
+//         let waker = cx.waker();
+//         let task_ref = unsafe { TaskRef::virt_task(waker.as_raw().data() as _) };
+//         ATSINTC.ps_push(task_ref, 0);
+//         core::task::Poll::Ready(0)
+//     }
+// }

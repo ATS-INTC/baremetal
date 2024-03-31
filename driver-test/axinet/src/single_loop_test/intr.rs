@@ -14,6 +14,15 @@ use pnet::packet::ethernet::MutableEthernetPacket;
 use crate::driver::AXI_DMA;
 
 static mut MTU: usize = 0;
+#[cfg(feature = "calculate")]
+static mut SCALE: usize = 0;
+#[cfg(feature = "calculate")]
+use {
+    crate::{gen_matrix, matrix_multiply, Matrix},
+    spin::Once,
+};
+#[cfg(feature = "calculate")]
+static MATRIX: Once<Matrix> = Once::new();
 
 
 pub fn intr_test() {
@@ -21,6 +30,14 @@ pub fn intr_test() {
         Some(s) => s.parse::<usize>().unwrap(),
         None => panic!("MTU is not specificed"),
     } };
+    #[cfg(feature = "calculate")]
+    {
+        unsafe { SCALE = match option_env!("SCALE") {
+            Some(s) => s.parse::<usize>().unwrap(),
+            None => panic!("SCALE is not specificed"),
+        } };
+        MATRIX.call_once(|| gen_matrix(unsafe { SCALE }));
+    }
     trap::plic_init();
     trap::init();
     log::info!("intr_test begin");
@@ -40,6 +57,10 @@ fn server(buf: BufPtr) {
         // receive
         HAS_INTR.fetch_add(1, Ordering::Relaxed);
         let rtransfer = AXI_DMA.rx_submit(buf.clone()).unwrap();
+        #[cfg(feature = "calculate")]
+        {
+            let _ = matrix_multiply(MATRIX.get().unwrap(), MATRIX.get().unwrap());
+        }
         while HAS_INTR.load(Ordering::Relaxed) > 0 { }
         let mut rbuf = rtransfer.recycle().unwrap();
         let slice = unsafe { core::slice::from_raw_parts_mut(rbuf.as_mut_ptr(), buf.len()) };

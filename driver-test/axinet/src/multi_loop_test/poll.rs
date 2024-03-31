@@ -1,10 +1,4 @@
-/// In this test, we will build a connect with PC.
-/// PC will send a raw Ethernet packet, then this test will receive it and send it back to PC after processing it.
-/// We will measure the CPU cycles of each phase in the connect.
-/// 
-/// The server of the test starts firstly and listens to the NIC.
-/// Then the client on PC will send a raw Ethernet packet.
-/// The server receives the packet, calculates and sends response to PC.
+/// In this case, the cpu will do computation after the NIC operation has been done.
 /// 
 
 use core::ptr::NonNull;
@@ -12,32 +6,15 @@ use alloc::{boxed::Box, vec};
 use axi_dma::BufPtr;
 use pnet::packet::ethernet::MutableEthernetPacket;
 use crate::driver::AXI_DMA;
+use super::{gen_matrix, matrix_multiply};
 
 static mut MTU: usize = 0;
-#[cfg(feature = "calculate")]
-static mut SCALE: usize = 0;
-#[cfg(feature = "calculate")]
-use {
-    crate::{gen_matrix, matrix_multiply, Matrix},
-    spin::Once,
-};
-#[cfg(feature = "calculate")]
-static MATRIX: Once<Matrix> = Once::new();
-
 
 pub fn poll_test() {
     unsafe { MTU = match option_env!("MTU") {
         Some(s) => s.parse::<usize>().unwrap(),
         None => panic!("MTU is not specificed"),
     } };
-    #[cfg(feature = "calculate")]
-    {
-        unsafe { SCALE = match option_env!("SCALE") {
-            Some(s) => s.parse::<usize>().unwrap(),
-            None => panic!("SCALE is not specificed"),
-        } };
-        MATRIX.call_once(|| gen_matrix(unsafe { SCALE }));
-    }
     log::info!("poll_test begin");
     let buffer = vec![0u8; unsafe {MTU}].into_boxed_slice();
     let len = buffer.len();
@@ -55,18 +32,16 @@ fn server(buf: BufPtr) {
         log::trace!("single receive ok");
 
         // Calculate
-        #[cfg(feature = "calculate")]
-        {
-            let _ = matrix_multiply(MATRIX.get().unwrap(), MATRIX.get().unwrap());
-        }
+        let matrix = gen_matrix(unsafe { MTU });
+        let _ = matrix_multiply(matrix.clone(), matrix.clone());
 
+        // Send response
         let mut eth_packet = MutableEthernetPacket::new(slice).unwrap();
         let src = eth_packet.get_source();
         let dest = eth_packet.get_destination();
         eth_packet.set_source(dest);
         eth_packet.set_destination(src);
 
-        // Send response
         let buf = BufPtr::new(NonNull::new(slice.as_mut_ptr()).unwrap(), slice.len());
         let _ = AXI_DMA.tx_submit(buf).unwrap().wait().unwrap();
         log::trace!("send response ok");

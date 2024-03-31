@@ -19,6 +19,13 @@ mod simple_receive_test;
 #[cfg(any(feature = "single_loop_poll", feature = "single_loop_intr", feature = "single_loop_atsintc"))]
 mod single_loop_test;
 
+#[cfg(feature = "calculate")]
+mod matrix;
+#[cfg(feature = "calculate")]
+use matrix::*;
+#[cfg(any(feature = "multi_loop_poll", feature = "multi_loop_intr", feature = "multi_loop_atsintc"))]
+mod multi_loop_test;
+
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
     mem::clear_bss();
@@ -33,6 +40,8 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     simple_receive_test::simple_receive_test();
     #[cfg(any(feature = "single_loop_poll", feature = "single_loop_intr", feature = "single_loop_atsintc"))]
     single_loop_test::single_loop_test();
+    #[cfg(any(feature = "multi_loop_poll", feature = "multi_loop_intr", feature = "multi_loop_atsintc"))]
+    multi_loop_test::multi_loop_test();
     unreachable!();
 }
 

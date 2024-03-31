@@ -12,7 +12,6 @@ import numpy as np
 
 MODE = sys.argv[1]
 MTU = int(sys.argv[2])
-SCALE = sys.argv[3]
 
 
 TIME_OUT = 10
@@ -37,27 +36,18 @@ pps = len(delays) / TIME_OUT
 avarage = np.mean(delays)
 std_deviation = np.std(delays)
 
-path = "../../assets/single_loop/" + MODE
+path = "../../assets/multi_loop/" + MODE
 if os.path.exists(path + "/" + MODE + ".dat"):
     with open(path + "/" + MODE + ".dat", mode='a', encoding='utf-8') as file:
-        if SCALE == None:
-            content = "{:-5d}\t\t\t{:07.3f}\t\t\t\t{:07.3f}\t\t\t\t{:07.1f}".format(MTU, avarage, std_deviation, pps)
-            file.write(content + "\n")
-        else:
-            content = "{:-5d}\t\t\t{:07.3f}\t\t\t\t{:07.3f}\t\t\t\t{:07.1f}\t\t\t\t{:5s}".format(MTU, avarage, std_deviation, pps, SCALE)
-            file.write(content + "\n")
+        content = "{:-5d}\t\t\t{:07.3f}\t\t\t\t{:07.3f}\t\t\t\t{:07.1f}".format(MTU, avarage, std_deviation, pps)
+        file.write(content + "\n")
 else:
     os.mkdir(path)
     os.chmod(path, stat.S_IRWXO + stat.S_IRWXG + stat.S_IRWXU)
     with open(path + "/" + MODE + ".dat", mode='w', encoding='utf-8') as file:
-        if SCALE == None:
-            file.write("Frame_size(Bytes)\tAvarage(us)\t\t\tStd_deviation\t\t\tThroughput(pps)\n")
-            content = "{:-5d}\t\t\t{:07.3f}\t\t\t\t{:07.3f}\t\t\t\t{:07.1f}".format(MTU, avarage, std_deviation, pps)
-            file.write(content + "\n")
-        else:
-            file.write("Frame_size(Bytes)\tAvarage(us)\t\t\tStd_deviation\t\t\tThroughput(pps)\t\t\tMatrix_size\n")
-            content = "{:-5d}\t\t\t{:07.3f}\t\t\t\t{:07.3f}\t\t\t\t{:07.1f}\t\t\t\t{:5s}".format(MTU, avarage, std_deviation, pps, SCALE)
-            file.write(content + "\n")
+        file.write("Frame_size(Bytes)\tAvarage(us)\t\t\tStd_deviation\t\t\tThroughput(pps)\n")
+        content = "{:-5d}\t\t\t{:07.3f}\t\t\t\t{:07.3f}\t\t\t\t{:07.1f}".format(MTU, avarage, std_deviation, pps)
+        file.write(content + "\n")
     os.chmod(path + "/" + MODE + ".dat", stat.S_IRWXO + stat.S_IRWXG + stat.S_IRWXU)
 
 with open(path + "/" + MODE + str(MTU) + "_delay.dat", mode='w', encoding='utf-8') as file:

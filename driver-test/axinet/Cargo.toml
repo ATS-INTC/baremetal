@@ -21,6 +21,8 @@ spin = "0.9"
 riscv = "0.11.0"
 pnet = { version = "0.34.0", default-features = false }
 embassy-net-driver = {version = "0.2.0", optional = true }
+rand_xorshift = { version = "0.3.0",  optional = true }
+rand_core = {version = "0.6.3", optional = true }
 
 [features]
 
@@ -38,4 +40,10 @@ single_loop_poll = []
 single_loop_intr = ["trap"]
 single_loop_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["simple_transmit_intr"]
+calculate = ["rand_xorshift", "rand_core"]
+
+multi_loop_poll = ["rand_xorshift", "rand_core"]
+multi_loop_intr = ["trap", "rand_xorshift", "rand_core"]
+multi_loop_atsintc = ["ats-intc", "axi-dma/async", "rand_xorshift", "rand_core"]
+
+default = ["single_loop_atsintc", "calculate"]
