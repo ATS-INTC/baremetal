@@ -4,7 +4,7 @@
 #[macro_use]
 extern crate log;
 
-mod plic;
+pub mod plic;
 
 use plic::intr_dispatch;
 use riscv::register::{

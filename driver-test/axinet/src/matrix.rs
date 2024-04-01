@@ -1,4 +1,4 @@
-use alloc::{sync::Arc, vec::Vec};
+use alloc::vec::Vec;
 use alloc::vec;
 use rand_core::{RngCore, SeedableRng};
 use rand_xorshift::XorShiftRng;

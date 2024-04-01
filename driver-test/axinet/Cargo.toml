@@ -42,8 +42,8 @@ single_loop_atsintc = ["ats-intc", "axi-dma/async"]
 
 calculate = ["rand_xorshift", "rand_core"]
 
-multi_loop_poll = ["rand_xorshift", "rand_core"]
-multi_loop_intr = ["trap", "rand_xorshift", "rand_core"]
-multi_loop_atsintc = ["ats-intc", "axi-dma/async", "rand_xorshift", "rand_core"]
+multi_loop_poll = []
+multi_loop_intr = ["trap"]
+multi_loop_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["single_loop_atsintc", "calculate"]
+default = ["multi_loop_atsintc", "calculate", "smp"]
