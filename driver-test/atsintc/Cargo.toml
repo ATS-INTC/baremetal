@@ -19,3 +19,9 @@ riscv = "0.11.0"
 
 [features]
 smp = []
+
+push = []
+fetch = []
+switch = []
+
+default = []
