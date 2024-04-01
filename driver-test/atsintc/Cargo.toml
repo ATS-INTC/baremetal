@@ -23,5 +23,6 @@ smp = []
 push = []
 fetch = []
 switch = []
+priority = []
 
 default = []

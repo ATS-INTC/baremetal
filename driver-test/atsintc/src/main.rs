@@ -15,7 +15,8 @@ mod push;
 mod fetch;
 #[cfg(feature = "switch")]
 mod switch;
-
+#[cfg(feature = "priority")]
+mod priority;
 
 /// The basic address of the kernel process
 const ATSINTC_BASEADDR: usize = 0x1000_0000;
@@ -35,6 +36,8 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     fetch::fetch_test();
     #[cfg(feature = "switch")]
     switch::switch_test();
+    #[cfg(feature = "priority")]
+    priority::priority_test();
     unreachable!();
 }
 
