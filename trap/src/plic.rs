@@ -16,7 +16,7 @@ pub fn get_context(hartid: usize, mode: char) -> usize {
 }
 
 pub fn init() {
-    for intr in 4..=6 {
+    for intr in 3..=3 {
         Plic::set_priority(intr, Priority::lowest());
     }
 }
@@ -27,7 +27,7 @@ pub fn init_hart(hart_id: usize) {
     Plic::clear_enable(context, 0);
     Plic::set_threshold(context, Priority::any());
     Plic::set_threshold(get_context(hart_id, 'M'), Priority::never());
-    for irq in 4..=6 {
+    for irq in 3..=3 {
         Plic::enable(context, irq);
         Plic::claim(context);
         Plic::complete(context, irq);

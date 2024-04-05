@@ -4,7 +4,7 @@
 pub const BOOT_STACK_SIZE: usize = 0x8000;
 
 /// SMP
-pub const CPU_NUM: usize = 1;
+pub const CPU_NUM: usize = 4;
 
 pub const HEAP_SIZE: usize = 0x400_0000;
 

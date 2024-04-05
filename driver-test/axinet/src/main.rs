@@ -26,6 +26,12 @@ use matrix::*;
 #[cfg(any(feature = "multi_loop_poll", feature = "multi_loop_intr", feature = "multi_loop_atsintc"))]
 mod multi_loop_test;
 
+#[cfg(any(feature = "ns_poll", feature = "ns_intr", feature = "ns_atsintc"))]
+mod netstack;
+#[cfg(any(feature = "ns_poll", feature = "ns_intr", feature = "ns_atsintc"))]
+mod net_stack_test;
+
+
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
     mem::clear_bss();
@@ -40,5 +46,7 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     single_loop_test::single_loop_test();
     #[cfg(any(feature = "multi_loop_poll", feature = "multi_loop_intr", feature = "multi_loop_atsintc"))]
     multi_loop_test::multi_loop_test();
+    #[cfg(any(feature = "ns_poll", feature = "ns_intr", feature = "ns_atsintc"))]
+    net_stack_test::net_stack_test();
     unreachable!();
 }

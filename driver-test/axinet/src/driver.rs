@@ -62,8 +62,8 @@ pub fn init() -> AxiDMAResult {
     eth.clear_rx_rject();
     eth.enable_rx_cmplt();
     eth.clear_rx_cmplt();
-    eth.enable_tx_cmplt();
-    eth.clear_tx_cmplt();
+    // eth.enable_tx_cmplt();
+    // eth.clear_tx_cmplt();
     eth.start();
     log::info!("NIC initialization has done!");
     Ok(())

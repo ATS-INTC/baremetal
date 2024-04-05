@@ -20,9 +20,25 @@ log = "0.4"
 spin = "0.9"
 riscv = "0.11.0"
 pnet = { version = "0.34.0", default-features = false }
-embassy-net-driver = {version = "0.2.0", optional = true }
 rand_xorshift = { version = "0.3.0",  optional = true }
 rand_core = {version = "0.6.3", optional = true }
+embassy-net = { path = "/home/zfl/ats-intc/embassy/embassy-net", features = ["udp", "tcp", "proto-ipv4", "medium-ethernet", "log"], optional = true }
+
+heapless = { version = "0.8", default-features = false, optional = true }
+static_cell = "2.0.0"
+
+
+[dependencies.smoltcp]
+git = "https://github.com/smoltcp-rs/smoltcp.git"
+rev = "b57e2f9e70e82a13f31d5ea17e55232c11cc2b2d"
+default-features = false
+features = [
+  "alloc", "log",   # no std
+  "medium-ethernet",
+  "proto-ipv4",
+  "socket-raw", "socket-icmp", "socket-udp", "socket-tcp",
+]
+optional = true
 
 [features]
 
@@ -46,4 +62,8 @@ multi_loop_poll = []
 multi_loop_intr = ["trap"]
 multi_loop_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["multi_loop_atsintc", "calculate", "smp"]
+ns_poll = ["smoltcp"]
+ns_intr = ["trap", "smoltcp"]
+ns_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
+
+default = ["ns_atsintc"]
