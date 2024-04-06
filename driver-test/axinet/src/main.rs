@@ -31,6 +31,8 @@ mod netstack;
 #[cfg(any(feature = "ns_poll", feature = "ns_intr", feature = "ns_atsintc"))]
 mod net_stack_test;
 
+#[cfg(feature = "multi_prio")]
+mod multi_prio;
 
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
@@ -48,5 +50,7 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     multi_loop_test::multi_loop_test();
     #[cfg(any(feature = "ns_poll", feature = "ns_intr", feature = "ns_atsintc"))]
     net_stack_test::net_stack_test();
+    #[cfg(feature = "multi_prio")]
+    multi_prio::multi_prio_test();
     unreachable!();
 }

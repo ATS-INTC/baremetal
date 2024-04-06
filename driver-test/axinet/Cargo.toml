@@ -26,6 +26,8 @@ embassy-net = { path = "/home/zfl/ats-intc/embassy/embassy-net", features = ["ud
 
 heapless = { version = "0.8", default-features = false, optional = true }
 static_cell = "2.0.0"
+lose-net-stack = { git = "https://github.com/yfblock/lose-net-stack", rev = "db42380", optional = true }
+managed = { version = "0.8", features = ["map"], default-features = false}
 
 
 [dependencies.smoltcp]
@@ -66,4 +68,6 @@ ns_poll = ["smoltcp"]
 ns_intr = ["trap", "smoltcp"]
 ns_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
-default = ["ns_atsintc"]
+multi_prio = ["ats-intc", "axi-dma/async", "lose-net-stack"]
+
+default = ["multi_prio"]
