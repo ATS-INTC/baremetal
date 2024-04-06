@@ -28,14 +28,24 @@ fn server() {
     );
     log::info!("net_stack {:?}", net_stack);
     ATSINTC.ps_push(net_stack, 0);
-    let tcp_server = Task::new(
+    let tcp_server0 = Task::new(
         Box::pin(tcp_server()), 
         0, 
         TaskType::Other, 
         &ATSINTC
     );
-    log::info!("tcp_server {:?}", tcp_server);
-    ATSINTC.ps_push(tcp_server, 0);
+    log::info!("tcp_server {:?}", tcp_server0);
+    ATSINTC.ps_push(tcp_server0, 0);
+
+    let tcp_server1 = Task::new(
+        Box::pin(tcp_server()), 
+        1, 
+        TaskType::Other, 
+        &ATSINTC
+    );
+    log::info!("tcp_server {:?}", tcp_server1);
+    ATSINTC.ps_push(tcp_server1, 1);
+
     loop {
         if let Some(task) = ATSINTC.ps_fetch() {
             let _ = task.clone().poll();
@@ -51,6 +61,13 @@ async fn tcp_server() -> i32 {
         let socket = socket.unwrap();
         socket.accept(80).await;
         log::debug!("connect ok");
+        if let Ok(_data) = socket.receive().await {
+            socket.send("connect ok".as_bytes());
+        } else {
+            log::debug!("socket error");
+            socket.close();
+            continue;
+        }
         loop {
             if let Ok(data) = socket.receive().await {
                 log::debug!("{:X?}", data);
