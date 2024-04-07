@@ -8,7 +8,6 @@ set xtics  norangelimit
 set xtics   ()
 set xlabel 'Frame Size(Bytes)'
 set ylabel 'Latency({/symbol \155}s)'
-set title "Throughput" 
 set xrange [ * : * ] noreverse writeback
 set yrange [ * : * ] noreverse writeback
 set colorbox vertical origin screen 0.9, 0.2 size screen 0.05, 0.6 front  noinvert bdefault
