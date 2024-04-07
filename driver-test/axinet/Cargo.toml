@@ -70,4 +70,4 @@ ns_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
 multi_prio = ["ats-intc", "axi-dma/async", "lose-net-stack"]
 
-default = ["multi_prio"]
+default = ["ns_poll"]
