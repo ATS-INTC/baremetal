@@ -169,7 +169,7 @@ impl SocketSet {
                 continue;
             }
             let sock = sock.as_mut().unwrap();
-            if sock.lport == lport {
+            if sock.lport == lport && sock.rport == 0 {
                 sock.rmac = tcp_packet.source_mac;
                 sock.raddr = tcp_packet.source_ip;
                 sock.rport = tcp_packet.source_port;

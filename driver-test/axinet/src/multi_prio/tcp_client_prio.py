@@ -8,13 +8,13 @@ from threading import Thread, Lock
 
 import threading
 import os
+sys.setrecursionlimit(2000)
 
 RUN_TIME_LIMIT = 5000
-
-matrix_size = 20
-req_freq = 0.05
-server_use_prio = 8
-threads_num = server_use_prio * 16
+matrix_size = int(sys.argv[2])
+req_freq = 0.01
+server_use_prio = int(sys.argv[1])
+threads_num = server_use_prio * int(sys.argv[3])
 
 global_num = 0
 lock = Lock()
@@ -23,8 +23,6 @@ global_delay = [[] for _ in range(server_use_prio)]
 threads = []
 
 local = threading.local()
-
-
 
 def get_matrix_string():
     random_numbers = [str(random.randint(0, 99)) for _ in range(matrix_size * matrix_size)]
@@ -76,9 +74,6 @@ def connect(index):
     time.sleep(0.2 * index)
     server_addr = ("172.16.1.2", 80)
     tcp_socket.connect(server_addr)
-
-    send_data = "connect ok?"
-    tcp_socket.send(send_data.encode("utf8"))
     recv_data = tcp_socket.recv(1024)
     tcp_socket.settimeout(50)
     print('recv connect result:', recv_data.decode("utf8"))
@@ -101,13 +96,13 @@ def merge_local_delay(local_delay, prio):
 
 def statistic():
     print("statistic")
-    dir = "./test_with_prio"
+    dir = "./multi_prio"
     if not os.path.exists(dir):
         os.makedirs(dir)
     global global_delay
     with lock:
         for i in range(server_use_prio):
-            result_file = dir + "/prio_" + str(i)
+            result_file = dir + "/prio_" + str(i) + ".dat"
             with open(result_file, 'a') as f:
                 for delay in global_delay[i]:
                     f.write(str(delay) + " ")

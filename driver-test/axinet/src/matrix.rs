@@ -1,4 +1,5 @@
-use alloc::vec::Vec;
+use alloc::string::ToString;
+use alloc::{string::String, vec::Vec};
 use alloc::vec;
 use rand_core::{RngCore, SeedableRng};
 use rand_xorshift::XorShiftRng;
@@ -33,6 +34,34 @@ pub fn matrix_multiply(a1: &Matrix, a2: &Matrix) -> Matrix
             {
                 matrix[i][j] += a1[i][k] * a2[k][j];
             }
+        }
+    }
+    matrix
+}
+
+#[allow(unused)]
+pub fn matrix_to_string(matrix: Matrix) -> String {
+    let mut ans = String::new();
+    let scale = matrix.len();
+    for i in 0..scale {
+        for j in 0..scale {
+            ans += &matrix[i][j].to_string();
+            ans += " ";
+        }
+    }
+    ans.pop();
+    ans
+}
+
+#[allow(unused)]
+pub fn string_to_matrix(content: &str, scale: usize) -> Matrix {
+    let mut matrix = vec![vec![0u64; scale]; scale];
+    let vec_string: Vec<&str> = content.split(" ").collect();
+    assert_eq!(scale * scale, vec_string.len());
+    for i in 0..scale {
+        for j in 0..scale {
+            matrix[i][j] = vec_string[i * scale + j].parse::<u64>().unwrap();
+            // println!("{}", ans[i][j]);
         }
     }
     matrix

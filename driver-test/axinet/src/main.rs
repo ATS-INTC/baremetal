@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(noop_waker)]
 #![feature(waker_getters)]
 #![no_main]
 
