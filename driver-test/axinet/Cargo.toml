@@ -74,4 +74,4 @@ smol_poll = ["smoltcp"]
 smol_intr = ["trap", "smoltcp"]
 smol_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
-default = ["smol_intr"]
+default = ["smol_atsintc"]

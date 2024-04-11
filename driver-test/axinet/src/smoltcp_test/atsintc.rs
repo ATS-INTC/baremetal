@@ -49,7 +49,6 @@ pub fn test() {
     ATSINTC.ps_push(server, 0);
     loop {
         if let Some(task) = ATSINTC.ps_fetch() {
-            log::debug!("fetch {:?}", task);
             let _ = task.clone().poll();
         }
     }
@@ -59,9 +58,9 @@ pub fn test() {
 async fn net_stack() -> i32 {
     poll_fn(|cx| {
         NET_STACK.run_one(cx);
-        // let task = TaskRef::from_cx(cx);
-        // ATSINTC.intr_push(2, task);
-        cx.waker().wake_by_ref();
+        let task = TaskRef::from_cx(cx);
+        ATSINTC.intr_push(2, task);
+        // cx.waker().wake_by_ref();
         Poll::<()>::Pending
     }).await;
     unreachable!()

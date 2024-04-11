@@ -34,13 +34,14 @@ pub fn test() {
         let tcp_socket = socket_sets.get_mut::<Socket>(socket_handle);
         if tcp_socket.can_recv() {
             if let Ok(_data) = tcp_socket.recv(|data| {
-                log::info!("data {:x?}", data);
+                log::debug!("data {:x?}", data);
                 (data.len(), data)
             }) {
                 let _ = tcp_socket.send_slice(b"connect ok");
             }
         }
         drop(socket_sets);
+        iface_poll();
     }    
 }
 
