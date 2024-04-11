@@ -1,15 +1,14 @@
 
 
-use core::{future::{poll_fn, Future}, pin::Pin, ptr::NonNull, task::{Context, Poll}};
+use core::ptr::NonNull;
 
-use alloc::{boxed::Box, sync::Arc, task, vec::Vec, vec};
-use ats_intc::{AtsIntc, Task, TaskRef};
-use axi_dma::{BufPtr, Transfer};
+use alloc::{boxed::Box, sync::Arc, vec};
+use axi_dma::BufPtr;
 use smoltcp::{
     iface::SocketHandle, phy::{Device, DeviceCapabilities, Medium, RxToken, TxToken}, socket::tcp::{Socket, SocketBuffer}, wire::{EthernetAddress, HardwareAddress}
 };
-use spin::{Lazy, Mutex};
-use crate::driver::{AxiNet, AXI_DMA};
+use spin::{Lazy, Mutex, Once};
+use crate::driver::{AxiNet, AXI_ETH};
 
 
 use smoltcp::iface::SocketSet;
@@ -18,13 +17,28 @@ use smoltcp::{
     time::Instant,
     wire::{IpAddress, IpCidr},
 };
-/// The basic address of the kernel process
-pub const ATSINTC_BASEADDR: usize = 0x1000_0000;
-/// The kernel ats-intc driver
-pub static ATSINTC: AtsIntc = AtsIntc::new(ATSINTC_BASEADDR);
 
 pub fn init() {
     set_up();
+}
+
+static SOCKET_HANDLE: Once<SocketHandle> = Once::new();
+pub fn test() {
+    log::info!("intr test begin");
+    let rx_buffer = SocketBuffer::new(vec![0u8; 4096]);
+    let tx_buffer = SocketBuffer::new(vec![0u8; 4096]);
+    let mut tcp_socket = Socket::new(rx_buffer, tx_buffer);
+    if !tcp_socket.is_open() {
+        if tcp_socket.listen(80).is_err() {
+            log::error!("tcp listen error");
+            return;
+        }
+    }
+    SOCKET_HANDLE.call_once(|| SOCKET_SET.lock().add(tcp_socket));
+    trap::plic_init();
+    trap::init();
+    // let socket_handle = SOCKET_SET.lock().add(tcp_socket);
+    loop { }
 }
 
 pub static AXI_NET: Lazy<AxiNet> = Lazy::new(|| AxiNet::default());
@@ -37,12 +51,12 @@ fn set_up() {
     });
 }
 
-pub fn iface_poll() -> bool {
+pub fn iface_poll() {
     INTERFACE.lock().poll(
         Instant::ZERO,
         unsafe { &mut *AXI_NET.as_mut_ptr() },
         &mut SOCKET_SET.lock(),
-    )
+    );
 }
 
 pub static INTERFACE: Lazy<Arc<Mutex<Interface>>> = Lazy::new(|| {
@@ -56,12 +70,28 @@ pub static INTERFACE: Lazy<Arc<Mutex<Interface>>> = Lazy::new(|| {
 pub static SOCKET_SET: Lazy<Arc<Mutex<SocketSet>>> =
     Lazy::new(|| Arc::new(Mutex::new(SocketSet::new(vec![]))));
 
-
 impl AxiNet {
     pub fn mac(&self) -> HardwareAddress {
         let mut addr = [0u8; 6];
         self.eth.lock().get_mac_address(&mut addr);
         HardwareAddress::Ethernet(EthernetAddress(addr))
+    }
+}
+
+impl RxToken for AxiNet {
+    fn consume<R, F>(self, f: F) -> R
+    where
+        F: FnOnce(&mut [u8]) -> R,
+    {
+        let mtu = self.capabilities().max_transmission_unit;
+        let buffer = vec![0u8; mtu].into_boxed_slice();
+        let len = buffer.len();
+        let buf_ptr = Box::into_raw(buffer) as *mut _;
+        let buf = BufPtr::new(NonNull::new(buf_ptr).unwrap(), len);
+        let mut rbuf = self.dma.rx_submit(buf).unwrap().wait().unwrap();
+        let buf = unsafe { core::slice::from_raw_parts_mut(rbuf.as_mut_ptr(), rbuf.len()) };
+        let mut box_buf = unsafe { Box::from_raw(buf) };
+        f(&mut box_buf)
     }
 }
 
@@ -83,31 +113,18 @@ impl TxToken for AxiNet {
 }
 
 impl Device for AxiNet {
-    type RxToken<'a> = RxFrame;
+    type RxToken<'a> = Self;
     type TxToken<'a> = Self;
 
     fn receive(
         &mut self,
         _timestamp: smoltcp::time::Instant,
     ) -> Option<(Self::RxToken<'_>, Self::TxToken<'_>)> {
-        if !unsafe { RX_FRAMES.is_empty() }{
-            log::debug!("eth can receive");
-            Some((unsafe { RX_FRAMES.pop().unwrap() }, self.clone()))
-        } else if self.eth.lock().can_receive() {
-            let buffer = vec![0u8; 1514].into_boxed_slice();
-            let len = buffer.len();
-            let buf_ptr = Box::into_raw(buffer) as *mut _;
-            let buf = BufPtr::new(NonNull::new(buf_ptr).unwrap(), len);
-            log::debug!("receive submit");
-            let mut rbuf = AXI_DMA.rx_submit(buf).unwrap().wait().unwrap();
-            log::info!("receive wake1");
-            let buf = unsafe { core::slice::from_raw_parts_mut(rbuf.as_mut_ptr(), rbuf.len()) };
-            let box_buf = unsafe { Box::from_raw(buf) };
-            Some((RxFrame { buf: box_buf }, self.clone()))
+        if self.eth.lock().can_receive() {
+            Some((self.clone(), self.clone()))
         } else {
             None
         }
-        
     }
 
     fn transmit(&mut self, _timestamp: smoltcp::time::Instant) -> Option<Self::TxToken<'_>> {
@@ -127,47 +144,21 @@ impl Device for AxiNet {
     }
 }
 
-static mut RX_FRAMES: Vec<RxFrame> = Vec::new();
-
-pub struct RxFrame {
-    buf: Box<[u8]>
-}
-
-impl RxToken for RxFrame {
-    fn consume<R, F>(mut self, f: F) -> R
-    where
-        F: FnOnce(&mut [u8]) -> R,
-    {
-        f(&mut self.buf)
+#[no_mangle]
+pub fn ext_intr_handler(_irq: usize) {
+    // log::info!("irq {} occur", _irq);
+    AXI_ETH.lock().clear_intr(0b1111111);
+    iface_poll();  
+    let mut socket_sets = SOCKET_SET.lock();
+    let tcp_socket = socket_sets.get_mut::<Socket>(SOCKET_HANDLE.get().unwrap().clone());
+    if tcp_socket.can_recv() {
+        if let Ok(_data) = tcp_socket.recv(|data| {
+            log::debug!("data {:x?}", data);
+            (data.len(), data)
+        }) {
+            let _ = tcp_socket.send_slice(b"connect ok");
+        }
     }
-}
-
-// async fn netstack_run() -> i32 {
-//     let mut flag = false;
-//     loop {
-//         iface_poll();
-//         poll_fn(|cx| {
-//             flag = !flag;
-//             if flag {
-//                 Poll::Pending
-//             } else {
-//                 Poll::Ready(0)
-//             }
-//         }).await;
-//     }
-// }
-
-pub async fn receive() -> i32 {
-    let buffer = vec![0u8; 1514].into_boxed_slice();
-    let len = buffer.len();
-    let buf_ptr = Box::into_raw(buffer) as *mut _;
-    let buf = BufPtr::new(NonNull::new(buf_ptr).unwrap(), len);
-    log::debug!("receive submit");
-    let mut rbuf = AXI_DMA.rx_submit(buf).unwrap().await;
-    log::info!("receive wake2");
-    let buf = unsafe { core::slice::from_raw_parts_mut(rbuf.as_mut_ptr(), rbuf.len()) };
-    let box_buf = unsafe { Box::from_raw(buf) };
-    unsafe { RX_FRAMES.push(RxFrame { buf: box_buf }) };
-    iface_poll();
-    0
+    drop(socket_sets);
+    iface_poll();  
 }

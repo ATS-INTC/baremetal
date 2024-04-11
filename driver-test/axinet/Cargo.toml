@@ -70,4 +70,8 @@ ns_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
 multi_prio = ["ats-intc", "axi-dma/async", "lose-net-stack", "calculate"]
 
-default = ["multi_prio"]
+smol_poll = ["smoltcp"]
+smol_intr = ["trap", "smoltcp"]
+smol_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
+
+default = ["smol_intr"]
