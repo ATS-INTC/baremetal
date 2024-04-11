@@ -38,6 +38,9 @@ mod multi_prio;
 #[cfg(any(feature = "smol_poll", feature = "smol_intr", feature = "smol_atsintc"))]
 mod smoltcp_test;
 
+#[cfg(feature = "multi_connection")]
+mod multi_connection;
+
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
     mem::clear_bss();
@@ -58,5 +61,7 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     multi_prio::multi_prio_test();
     #[cfg(any(feature = "smol_poll", feature = "smol_intr", feature = "smol_atsintc"))]
     smoltcp_test::smol_test();
+    #[cfg(feature = "multi_connection")]
+    multi_connection::multi_connection_test();
     unreachable!();
 }

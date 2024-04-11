@@ -74,4 +74,6 @@ smol_poll = ["smoltcp"]
 smol_intr = ["trap", "smoltcp"]
 smol_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
-default = ["smol_atsintc"]
+multi_connection = ["ats-intc", "axi-dma/async", "embassy-net", "heapless", "calculate"]
+
+default = ["multi_connection"]
