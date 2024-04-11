@@ -9,6 +9,7 @@ import os
 import stat
 
 MODE = sys.argv[1]
+SCALE = sys.argv[2]
 
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
@@ -33,7 +34,7 @@ std_deviation = np.std(delays)
 print(avarage)
 print(std_deviation)
 
-path = "../../assets/smoltcp_test/" + MODE
+path = "../../assets/smoltcp_test/" + MODE + SCALE
 if os.path.exists(path + "/" + MODE + ".dat"):
     with open(path + "/" + MODE + ".dat", mode='a', encoding='utf-8') as file:
         content = "{:07.3f}\t\t\t\t{:07.3f}".format(avarage, std_deviation)

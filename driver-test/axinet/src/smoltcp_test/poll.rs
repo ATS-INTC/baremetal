@@ -5,8 +5,8 @@ use axi_dma::BufPtr;
 use smoltcp::{
     phy::{Device, DeviceCapabilities, Medium, RxToken, TxToken}, socket::tcp::{Socket, SocketBuffer}, wire::{EthernetAddress, HardwareAddress}
 };
-use spin::{Lazy, Mutex};
-use crate::driver::AxiNet;
+use spin::{Lazy, Mutex, Once};
+use crate::{driver::AxiNet, Matrix};
 
 
 use smoltcp::iface::SocketSet;
@@ -16,7 +16,17 @@ use smoltcp::{
     wire::{IpAddress, IpCidr},
 };
 
+static mut SCALE: usize = 0;
+static MATRIX: Once<Matrix> = Once::new();
+
 pub fn test() {
+    unsafe { 
+        SCALE = match option_env!("SCALE") {
+            Some(s) => s.parse::<usize>().unwrap(),
+            None => panic!("SCALE is not specificed"),
+        };
+        MATRIX.call_once(|| crate::gen_matrix(SCALE));
+    };
     log::info!("poll test begin");
     let rx_buffer = SocketBuffer::new(vec![0u8; 4096]);
     let tx_buffer = SocketBuffer::new(vec![0u8; 4096]);
@@ -37,6 +47,7 @@ pub fn test() {
                 log::debug!("data {:x?}", data);
                 (data.len(), data)
             }) {
+                let _ = crate::matrix_multiply(MATRIX.get().unwrap(), MATRIX.get().unwrap());
                 let _ = tcp_socket.send_slice(b"connect ok");
             }
         }

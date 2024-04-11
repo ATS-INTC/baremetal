@@ -2,8 +2,8 @@
 use ats_intc::{AtsIntc, Task, TaskRef, TaskType};
 use heapless::Vec;
 use embassy_net::{driver::*, tcp::TcpSocket, Config, Ipv4Address, Ipv4Cidr, Stack, StackResources, StaticConfigV4};
-use spin::{Lazy, Mutex};
-use crate::driver::{AxiNet, AXI_ETH};
+use spin::{Lazy, Mutex, Once};
+use crate::{driver::{AxiNet, AXI_ETH}, Matrix};
 use core::{future::poll_fn, ptr::NonNull, task::Poll};
 use alloc::{boxed::Box, sync::Arc, vec};
 use axi_dma::BufPtr;
@@ -31,7 +31,17 @@ pub fn init() {
     
 }
 
+static mut SCALE: usize = 0;
+static MATRIX: Once<Matrix> = Once::new();
+
 pub fn test() {
+    unsafe { 
+        SCALE = match option_env!("SCALE") {
+            Some(s) => s.parse::<usize>().unwrap(),
+            None => panic!("SCALE is not specificed"),
+        };
+        MATRIX.call_once(|| crate::gen_matrix(SCALE));
+    };
     log::info!("atsintc test begin");
     let net_stack = Task::new(
         Box::pin(net_stack()), 
@@ -82,6 +92,7 @@ async fn server() -> i32 {
         loop {
             if let Ok(n) = socket.read(&mut buf).await {
                 // log::debug!("rxd {}", core::str::from_utf8(&buf[..n]).unwrap());
+                let _ = crate::matrix_multiply(MATRIX.get().unwrap(), MATRIX.get().unwrap());
                 if let Err(e) = socket.write(b"connect ok").await {
                     log::warn!("write error: {:?}", e);
                     break;
