@@ -15,23 +15,15 @@ pub fn get_context(hartid: usize, mode: char) -> usize {
         }
 }
 
-pub fn init() {
-    for intr in 3..=3 {
-        Plic::set_priority(intr, Priority::lowest());
-    }
-}
-
-
-pub fn init_hart(hart_id: usize) {
+pub fn enable_irq(irq: usize, hart_id: usize) {
+    Plic::set_priority(irq as _, Priority::lowest());
     let context = get_context(hart_id, 'S');
     Plic::clear_enable(context, 0);
     Plic::set_threshold(context, Priority::any());
     Plic::set_threshold(get_context(hart_id, 'M'), Priority::never());
-    for irq in 3..=3 {
-        Plic::enable(context, irq);
-        Plic::claim(context);
-        Plic::complete(context, irq);
-    }
+    Plic::enable(context, irq as _);
+    Plic::claim(context);
+    Plic::complete(context, irq as _);
 }
 
 pub fn intr_dispatch(hart_id: usize, mode: char) {

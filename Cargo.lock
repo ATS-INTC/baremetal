@@ -143,6 +143,7 @@ dependencies = [
  "console",
  "embassy-net",
  "heapless",
+ "kernel_guard",
  "langitem",
  "log",
  "lose-net-stack",
@@ -266,6 +267,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "crate_interface"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d54b79db793871881b52a1eb5dc6fd869743122e34795f12db8e183dcb6a4f28"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.58",
 ]
 
 [[package]]
@@ -607,6 +619,16 @@ checksum = "0bfb9eb618601c89945a70e254898da93b13be0388091d42117462b265bb3fad"
 dependencies = [
  "hash32",
  "stable_deref_trait",
+]
+
+[[package]]
+name = "kernel_guard"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5638cc8298368ef284589ad372890c849b520cccd50567d86a77a9232e68afdc"
+dependencies = [
+ "cfg-if",
+ "crate_interface",
 ]
 
 [[package]]

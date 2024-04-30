@@ -5,7 +5,7 @@ use spin::{Lazy, Mutex};
 
 const DMA_BASE: usize = 0x6010_0000;
 const ETH_BASE: usize = 0x60140000;
-const BD_CNT: usize = 1024;
+const BD_CNT: usize = 32;
 const MAC_ADDR: [u8; 6] = [0x00, 0x0A, 0x35, 0x01, 0x02, 0x03];
 
 #[derive(Clone)]

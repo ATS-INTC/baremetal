@@ -4,7 +4,7 @@
 #[macro_use]
 extern crate log;
 
-pub mod plic;
+mod plic;
 
 use plic::intr_dispatch;
 use riscv::register::{
@@ -16,7 +16,7 @@ use riscv::register::{
 
 #[repr(C)]
 #[derive(Debug)]
-pub struct TrapContext {
+struct TrapContext {
     pub x: [usize; 32],
     pub sstatus: Sstatus,
     pub sepc: usize,
@@ -24,15 +24,11 @@ pub struct TrapContext {
 
 // core::arch::global_asm!(include_str!("trap.asm"));
 
-pub fn plic_init() {
-    plic::init();
-    plic::init_hart(hart_id());
+pub fn enable_irq(irq: usize) {
+    plic::enable_irq(irq, hart_id());
 }
 
 pub fn init() {
-    // extern "C" {
-    //     fn __alltraps();
-    // }
     unsafe {
         stvec::write(__alltraps as usize, TrapMode::Direct);
         // enable supervisor interrupt
@@ -43,7 +39,7 @@ pub fn init() {
 }
 
 #[no_mangle]
-pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
+fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
     let scause = scause::read();
     let stval = stval::read();
     match scause.cause() {
