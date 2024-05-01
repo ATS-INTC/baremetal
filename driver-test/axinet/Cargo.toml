@@ -80,8 +80,8 @@ transmit_line_speed_poll = []
 transmit_line_speed_intr = ["trap"]
 transmit_line_speed_atsintc = ["ats-intc", "axi-dma/async"]
 
-receive_line_speed_poll = []
-receive_line_speed_intr = ["trap"]
-receive_line_speed_atsintc = ["ats-intc", "axi-dma/async"]
+eth_transieve_poll = []
+eth_transieve_intr = ["trap"]
+eth_transieve_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = []
+default = ["eth_transieve_atsintc"]
