@@ -20,8 +20,8 @@ log = "0.4"
 spin = "0.9"
 riscv = "0.11.0"
 pnet = { version = "0.34.0", default-features = false }
-rand_xorshift = { version = "0.3.0",  optional = true }
-rand_core = {version = "0.6.3", optional = true }
+rand_xorshift = { version = "0.3.0" }
+rand_core = {version = "0.6.3" }
 embassy-net = { path = "/home/zfl/ats-intc/embassy/embassy-net", features = ["udp", "tcp", "proto-ipv4", "medium-ethernet", "log"], optional = true }
 
 heapless = { version = "0.8", default-features = false, optional = true }
@@ -58,7 +58,6 @@ single_loop_poll = []
 single_loop_intr = ["trap"]
 single_loop_atsintc = ["ats-intc", "axi-dma/async"]
 
-calculate = ["rand_xorshift", "rand_core"]
 
 multi_loop_poll = []
 multi_loop_intr = ["trap"]
@@ -68,13 +67,13 @@ ns_poll = ["smoltcp"]
 ns_intr = ["trap", "smoltcp"]
 ns_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
-multi_prio = ["ats-intc", "axi-dma/async", "lose-net-stack", "calculate"]
+multi_prio = ["ats-intc", "axi-dma/async", "lose-net-stack"]
 
-smol_poll = ["smoltcp", "calculate"]
+smol_poll = ["smoltcp"]
 smol_intr = ["trap", "smoltcp"]
-smol_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless",  "calculate"]
+smol_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
-multi_connection = ["ats-intc", "axi-dma/async", "embassy-net", "heapless", "calculate"]
+multi_connection = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
 transmit_line_speed_poll = []
 transmit_line_speed_intr = ["trap"]
@@ -84,4 +83,12 @@ eth_transieve_poll = []
 eth_transieve_intr = ["trap"]
 eth_transieve_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["eth_transieve_atsintc"]
+ns_ping_poll = ["smoltcp"]
+ns_ping_intr = ["trap", "smoltcp"]
+ns_ping_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
+
+single_tcp_poll = ["smoltcp"]
+single_tcp_intr = ["trap", "smoltcp"]
+single_tcp_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
+
+default = ["single_tcp_atsintc"]

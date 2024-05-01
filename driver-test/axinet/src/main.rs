@@ -14,8 +14,11 @@ mod matrix;
 #[cfg(any(feature = "transmit_line_speed_poll", feature = "transmit_line_speed_intr", feature = "transmit_line_speed_atsintc"))]
 mod transmit_line_speed;
 
-#[cfg(any(feature = "eth_transieve_poll", feature = "eth_transieve_intr", feature = "eth_transieve_atsintc"))]
-mod eth_transieve_loop;
+#[cfg(any(feature = "ns_ping_poll", feature = "ns_ping_intr", feature = "ns_ping_atsintc"))]
+mod ns_ping;
+
+#[cfg(any(feature = "single_tcp_poll", feature = "single_tcp_intr", feature = "single_tcp_atsintc"))]
+mod single_tcp;
 
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
@@ -25,9 +28,11 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
     let _ = driver::init().map_err(|e| panic!("Error {:?} occurred!", e));
     #[cfg(any(feature = "transmit_line_speed_poll", feature = "transmit_line_speed_intr", feature = "transmit_line_speed_atsintc"))]
     transmit_line_speed::transmit_line_speed_test();
-    #[cfg(any(feature = "receive_line_speed_poll", feature = "receive_line_speed_intr", feature = "receive_line_speed_atsintc"))]
-    receive_line_speed::receive_line_speed_test();
-    #[cfg(any(feature = "eth_transieve_poll", feature = "eth_transieve_intr", feature = "eth_transieve_atsintc"))]
-    eth_transieve_loop::eth_transieve_loop_test();
+
+    #[cfg(any(feature = "ns_ping_poll", feature = "ns_ping_intr", feature = "ns_ping_atsintc"))]
+    ns_ping::ns_ping_test();
+
+    #[cfg(any(feature = "single_tcp_poll", feature = "single_tcp_intr", feature = "single_tcp_atsintc"))]
+    single_tcp::single_tcp_test();
     unreachable!();
 }
