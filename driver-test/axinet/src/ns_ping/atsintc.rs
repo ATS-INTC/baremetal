@@ -44,7 +44,7 @@ async fn net_task() -> i32 {
 
 #[no_mangle]
 pub extern "C" fn _embassy_time_now() -> u64 {
-    riscv::register::time::read64()
+    0
 }
 
 #[no_mangle]

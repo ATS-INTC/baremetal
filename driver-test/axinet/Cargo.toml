@@ -91,4 +91,4 @@ single_tcp_poll = ["smoltcp"]
 single_tcp_intr = ["trap", "smoltcp"]
 single_tcp_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
-default = ["single_tcp_atsintc"]
+default = []
