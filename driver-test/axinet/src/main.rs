@@ -20,6 +20,9 @@ mod ns_ping;
 #[cfg(any(feature = "single_tcp_poll", feature = "single_tcp_intr", feature = "single_tcp_atsintc"))]
 mod single_tcp;
 
+#[cfg(feature = "prio_connect")]
+mod prio_connect;
+
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
     mem::clear_bss();
@@ -34,5 +37,9 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
 
     #[cfg(any(feature = "single_tcp_poll", feature = "single_tcp_intr", feature = "single_tcp_atsintc"))]
     single_tcp::single_tcp_test();
+
+    #[cfg(feature = "prio_connect")]
+    prio_connect::prio_connect_test();
+    
     unreachable!();
 }
