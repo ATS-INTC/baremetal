@@ -46,42 +46,9 @@ optional = true
 
 smp = []
 
-simple_transmit_poll = []
-simple_transmit_intr = ["trap"]
-simple_transmit_atsintc = ["ats-intc", "axi-dma/async"]
-
-simple_receive_poll = []
-simple_receive_intr = ["trap"]
-simple_receive_atsintc = ["ats-intc", "axi-dma/async"]
-
-single_loop_poll = []
-single_loop_intr = ["trap"]
-single_loop_atsintc = ["ats-intc", "axi-dma/async"]
-
-
-multi_loop_poll = []
-multi_loop_intr = ["trap"]
-multi_loop_atsintc = ["ats-intc", "axi-dma/async"]
-
-ns_poll = ["smoltcp"]
-ns_intr = ["trap", "smoltcp"]
-ns_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
-
-multi_prio = ["ats-intc", "axi-dma/async", "lose-net-stack"]
-
-smol_poll = ["smoltcp"]
-smol_intr = ["trap", "smoltcp"]
-smol_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
-
-multi_connection = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
-
 transmit_line_speed_poll = []
 transmit_line_speed_intr = ["trap"]
 transmit_line_speed_atsintc = ["ats-intc", "axi-dma/async"]
-
-eth_transieve_poll = []
-eth_transieve_intr = ["trap"]
-eth_transieve_atsintc = ["ats-intc", "axi-dma/async"]
 
 ns_ping_poll = ["smoltcp"]
 ns_ping_intr = ["trap", "smoltcp"]
@@ -90,5 +57,7 @@ ns_ping_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 single_tcp_poll = ["smoltcp"]
 single_tcp_intr = ["trap", "smoltcp"]
 single_tcp_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
+
+prio_connect = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
 default = []
