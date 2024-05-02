@@ -13,7 +13,7 @@ def main():
     with open(freq_file, "w") as points_file:
         freq = 1.0 / len(result)
         for idx, val in enumerate(result):
-            points_file.write(str(val) + " " + str(freq) + "\n")
+            points_file.write(str(int(val)) + " " + str(freq) + "\n")
     mean = np.mean(result)
     std = np.std(result)
     stat_file = result_file.removesuffix(".dat") + "_stat.dat"
