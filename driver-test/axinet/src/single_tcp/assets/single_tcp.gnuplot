@@ -26,5 +26,5 @@ set style fill solid 1 border -1
 plot datafile using 2 with histogram title 'ATSINTC', '' \
     using 4 with histogram title 'Poll', '' \
     using 6 with histogram title 'Interrupt', \
-    datafile using ($0):($4):(fn2(compare($4, $2))) title '' with labels font fontSpec(10) rot by 90 offset char 0, 1.0, \
-    datafile using ($0):($6):(fn2(compare($6, $2))) title '' with labels font fontSpec(10) rot by 90 offset char 4, 1.0, \
+    datafile using ($0):($4):(fn2(compare($4, $2))) title '' with labels textcolor rgb "#404040" font fontSpec(10) rot by 90 offset char 0, 1.0, \
+    datafile using ($0):($6):(fn2(compare($6, $2))) title '' with labels textcolor rgb "#404040" font fontSpec(10) rot by 90 offset char 4, 1.0, \

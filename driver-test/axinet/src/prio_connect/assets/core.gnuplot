@@ -24,4 +24,4 @@ datafile = 'core.dat'
 
 plot datafile using 2 with linespoints t 'core3', '' using 4 with linespoints t 'core4', \
     datafile using (sub($4, $2)) t 'diff' with histograms linetype -1 fill transparent solid 0.2 border 0 axis x1y2, \
-    datafile using ($0):(sub($4, $2)):(fn(sub($4, $2))) t '' with labels font fontSpec(10) offset char 0, 1.0  axis x1y2
+    datafile using ($0):(sub($4, $2)):(fn(sub($4, $2))) t '' with labels textcolor rgb "#404040" font fontSpec(10) offset char 0, 1.0  axis x1y2

@@ -13,9 +13,9 @@ set ytics nomirror
 set boxwidth 0.8
 set grid linetype 0 linewidth 1 linecolor rgb "gray"
 
-set label fn(90) at 0.725,91 font fontSpec(12)
-set label fn(96) at 0.975,97 font fontSpec(12)
-set label fn(104) at 1.225,105 font fontSpec(12)
+set label fn(90) at 0.725,91 textcolor rgb "#404040" font fontSpec(10)
+set label fn(96) at 0.975,97 textcolor rgb "#404040" font fontSpec(10)
+set label fn(104) at 1.225,105 textcolor rgb "#404040" font fontSpec(10)
 
 datafile = 'ns_ping.dat'
 
