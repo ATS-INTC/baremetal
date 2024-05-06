@@ -60,4 +60,4 @@ single_tcp_atsintc = ["ats-intc", "axi-dma/async", "embassy-net", "heapless"]
 
 prio_connect = ["ats-intc", "axi-dma/async", "embassy-net", "heapless", "smp"]
 
-default = ["prio_connect"]
+default = []

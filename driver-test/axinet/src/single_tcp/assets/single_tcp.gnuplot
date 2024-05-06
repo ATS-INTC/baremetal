@@ -13,7 +13,7 @@ set grid ytics
 set grid linetype 0
 
 set xrange [0.5 : 5.5]
-set xtics ("0" 1, "1" 2, "4" 3, "8" 4, "16" 5)
+set xtics ("1" 1, "2" 2, "4" 3, "8" 4, "16" 5)
 set xlabel "Matrix-size"
 
 set logscale y 2
