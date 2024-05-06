@@ -14,7 +14,7 @@ datafile1 = 'atsintc/atsintc_delay_freq.dat'
 datafile2 = 'poll/poll_delay_freq.dat'
 datafile3 = 'intr/intr_delay_freq.dat'
 
-set style fill transparent solid 0.8 border -1
+set style fill transparent solid 0.8 border -2
 plot datafile1 using 1:2 smooth frequency w filledcurves t "ATSINTC", \
      datafile2 using 1:2 smooth frequency w filledcurves t "Poll", \
      datafile3 using 1:2 smooth frequency w filledcurves t "Interrupt", \

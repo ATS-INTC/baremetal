@@ -3,8 +3,8 @@ fontSpec(s) = sprintf("Times-Roman, %d", s)
 fn(v) = sprintf("%.0f", v)
 sub(a, b) = a-b
 
-# set key left top
-unset key
+set key left top
+# unset key
 set noborder
 set xtics nomirror
 set ytics nomirror
@@ -22,6 +22,6 @@ set logscale y2
 set y2tics
 datafile = 'prio_impact.dat'
 
-plot datafile using 2 with linespoints, '' using 4 with linespoints, \
-    datafile using (sub($2, $4)) with histograms linetype -1 fill transparent solid 0.2 border 0 axis x1y2, \
-    datafile using ($0):(sub($2, $4)):(fn(sub($2, $4))) with labels font fontSpec(10) offset char 0, 1.0  axis x1y2
+plot datafile using 2 with linespoints t 'base', '' using 4 with linespoints t 'priority', \
+    datafile using (sub($2, $4)) t 'diff' with histograms linetype -1 fill transparent solid 0.2 border 0 axis x1y2, \
+    datafile using ($0):(sub($2, $4)):(fn(sub($2, $4))) t '' with labels font fontSpec(10) offset char 0, 1.0  axis x1y2
