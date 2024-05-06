@@ -1,6 +1,6 @@
 fontSpec(s) = sprintf("Times-Roman, %d", s)
 fn(v) = sprintf("%.0f", v)
-set key left top font ",12"
+set key left top
 set noborder
 set style data histogram
 set style histogram clustered gap 1
