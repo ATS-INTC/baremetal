@@ -1,10 +1,15 @@
-
-fontSpec(s) = sprintf("Times-Roman, %d", s)
+set terminal pdfcairo enhanced size 8in,6in font "Arial,24"
+set output 'single_tcp.pdf'
 fn(v) = sprintf("%.0f", v)
 compare(a, b) = a / b
 fn2(v) = sprintf("%.2f", v)
 
-set key left top
+set key horizontal center top Left reverse at graph 0.5, 1.125
+
+fn(v) = sprintf("%.0f", v)
+compare(a, b) = a / b
+fn2(v) = sprintf("%.2f", v)
+
 # unset key
 set noborder
 set xtics nomirror
@@ -22,9 +27,10 @@ set ylabel 'Latency({/symbol \155}s)'
 # set logscale y2
 # set y2tics
 datafile = 'single_tcp.dat'
+set size 1.0, 0.9
 set style fill solid 1 border -1
-plot datafile using 2 with histogram title 'ATSINTC', '' \
+plot datafile using 2 with histogram title 'TAINTC', '' \
     using 4 with histogram title 'Poll', '' \
     using 6 with histogram title 'Interrupt', \
-    datafile using ($0):($4):(fn2(compare($4, $2))) title '' with labels textcolor rgb "#404040" font fontSpec(10) rot by 90 offset char 0, 1.0, \
-    datafile using ($0):($6):(fn2(compare($6, $2))) title '' with labels textcolor rgb "#404040" font fontSpec(10) rot by 90 offset char 4, 1.0, \
+    datafile using ($0):($4):(fn2(compare($4, $2))) title '' with labels textcolor rgb "#404040" rot by 90 offset char 0, 1.0, \
+    datafile using ($0):($6):(fn2(compare($6, $2))) title '' with labels textcolor rgb "#404040" rot by 90 offset char 2, 1.0, \

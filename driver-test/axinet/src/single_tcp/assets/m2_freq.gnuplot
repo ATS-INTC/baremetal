@@ -16,6 +16,6 @@ datafile2 = 'intr2/intr_delay_freq.dat'
 
 
 set style fill transparent solid 0.8 border -2
-plot datafile0 using 1:2 smooth frequency w filledcurves t "ATSINTC", \
+plot datafile0 using 1:2 smooth frequency w filledcurves t "TAINTC", \
     datafile1 using 1:2 smooth frequency w filledcurves t "Poll", \
     datafile2 using 1:2 smooth frequency w filledcurves t "Interrupt", \
