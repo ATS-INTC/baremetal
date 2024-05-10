@@ -17,7 +17,7 @@ set origin 0.0, 0.05
 set size 0.5, 0.9
 set title 'CPU cycles'
 set xlabel 'a'
-plot datafile1 using 2:xtic(1) t 'TAINTC', '' \
+plot datafile1 using 2:xtic(1) t 'TAIC', '' \
     using 3:xtic(1) t 'Poll', '' \
     using 4:xtic(1) t 'Interrupt'
 

@@ -29,7 +29,7 @@ set ylabel 'Latency({/symbol \155}s)'
 datafile = 'single_tcp.dat'
 set size 1.0, 0.9
 set style fill solid 1 border -1
-plot datafile using 2 with histogram title 'TAINTC', '' \
+plot datafile using 2 with histogram title 'TAIC', '' \
     using 4 with histogram title 'Poll', '' \
     using 6 with histogram title 'Interrupt', \
     datafile using ($0):($4):(fn2(compare($4, $2))) title '' with labels textcolor rgb "#404040" rot by 90 offset char 0, 1.0, \

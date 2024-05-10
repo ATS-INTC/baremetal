@@ -31,7 +31,7 @@ datafile0 = 'atsintc2/atsintc_delay_freq.dat'
 datafile1 = 'poll2/poll_delay_freq.dat'
 datafile2 = 'intr2/intr_delay_freq.dat'
 
-plot datafile0 using 1:2 smooth frequency w filledcurves t "TAINTC", \
+plot datafile0 using 1:2 smooth frequency w filledcurves t "TAIC", \
     datafile1 using 1:2 smooth frequency w filledcurves t "", \
     datafile2 using 1:2 smooth frequency w filledcurves t "", \
 
