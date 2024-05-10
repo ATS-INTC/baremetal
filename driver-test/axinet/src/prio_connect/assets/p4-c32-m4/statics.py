@@ -12,7 +12,7 @@ def main():
     result = np.array([float(x) for x in result_list])
     sort_array = np.sort(result)
     length = len(sort_array)
-    lastp1 = length * 0.005
+    lastp1 = length * 0.01
     print(length)
     print(lastp1)
     # print(sort_array[-int(lastp1):])
