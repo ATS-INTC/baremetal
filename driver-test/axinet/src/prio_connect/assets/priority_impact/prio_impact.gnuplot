@@ -4,7 +4,7 @@ set output 'prio_impact.pdf'
 fn(v) = sprintf("%.0f", v)
 sub(a, b) = a-b
 
-set key horizontal center top Left reverse at graph 0.5, 1.15 samplen 2
+set key horizontal center top Left reverse at graph 0.12, -0.1
 # unset key
 set noborder
 # set title 'Latency({/symbol \155}s)'
@@ -64,8 +64,9 @@ set multiplot layout 1, 3
 #               using 6 with histogram t '', \
 
 ##################################################
-set xlabel "c-64"
+set xlabel "Connection-64"
 set ytics 1000
+set ylabel 'Latency({/symbol \155}s)'
 datafile = 'connect64.dat'
 set size 0.33, 0.9
 set origin 0.005, 0
@@ -76,20 +77,23 @@ plot datafile using 2 with histogram t '', '' \
               using 6 with histogram t '', \
 
 ##################################################
-set xlabel "c-128"
+set xlabel "Connection-128"
 set ytics 1000
+unset ylabel
 datafile = 'connect128.dat'
 set size 0.33, 0.9
 set origin 0.335, 0
-plot datafile using 2 with histogram t 'Base', '' \
-              using 3 with histogram t 'P0', '' \
-              using 4 with histogram t 'P1', '' \
-              using 5 with histogram t 'P2', '' \
-              using 6 with histogram t 'P3', \
+plot datafile using 2 with histogram t '', '' \
+              using 3 with histogram t '', '' \
+              using 4 with histogram t '', '' \
+              using 5 with histogram t '', '' \
+              using 6 with histogram t '', \
 
 ##################################################
-set xlabel "c-256"
+set xlabel "Connection-256"
 set ytics 1000
+unset ylabel
+
 datafile = 'connect256.dat'
 set size 0.33, 0.9
 set origin 0.665, 0
@@ -98,3 +102,15 @@ plot datafile using 2 with histogram t '', '' \
               using 4 with histogram t '', '' \
               using 5 with histogram t '', '' \
               using 6 with histogram t '', \
+
+set xlabel "Connection-128"
+set ytics 1000
+unset ylabel
+datafile = 'connect128.dat'
+set size 1.0, 1.0
+set origin 0.335, 1.0
+plot datafile using 2 with histogram t 'Base', '' \
+              using 3 with histogram t 'P0', '' \
+              using 4 with histogram t 'P1', '' \
+              using 5 with histogram t 'P2', '' \
+              using 6 with histogram t 'P3', \
