@@ -23,6 +23,9 @@ mod single_tcp;
 #[cfg(feature = "prio_connect")]
 mod prio_connect;
 
+#[cfg(any(feature = "single_loop_poll", feature = "single_loop_intr", feature = "single_loop_atsintc"))]
+mod single_loop;
+
 #[no_mangle]
 pub extern "C" fn rust_main_init(_hart_id: usize) {
     mem::clear_bss();
@@ -40,6 +43,9 @@ pub extern "C" fn rust_main_init(_hart_id: usize) {
 
     #[cfg(feature = "prio_connect")]
     prio_connect::prio_connect_test();
+
+    #[cfg(any(feature = "single_loop_poll", feature = "single_loop_intr", feature = "single_loop_atsintc"))]
+    single_loop::single_loop_test();
     
     unreachable!();
 }
