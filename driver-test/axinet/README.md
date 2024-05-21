@@ -3,29 +3,92 @@
 
 The AxiNic consists of a Xilinx AXI DMA and a Xilinx AXI Ethernet 1G/2.5G subsystem. The AXI Ethernet is configured as 1Gbits/s.
 
-We will conduct three test: 
+We built three models:
 
-- [x] Poll mode.
-- [x] Interrupt mode.
+- [x] Poll.
+- [x] Interrupt.
 - [x] Rust Future + ATSINTC.
 
-**The result of comparation can be seen in the [assets](./assets/) directory.**
+## Tests
 
-## Poll mode
+- [x] Line speed test.
+- [x] Transmit and receiver test.
+- [x] Single loop test.
+- [x] Single tcp test.
+- [x] Network Protocal Stack test.
+- [x] Multiple priority connections test.
 
-In this case, we create a buffer and submit it to the AxiNic. Then we wait the transmition to be finished by checking the AXI DMA interrupt status register. We won't submit the next buffer until the previous transmition has been completed. The test result is shown below:
+How to run tests on FPGA?
+- `make DRIVER=axinet run TEST=$(TEST)`
 
-We measure the AxiNic performance by counting the amount of bytes sent within one second. The total data size is 10GB.
 
-## Interrupt mode
+### [Line speed test](./src/transmit_line_speed/)
 
-The configuration of AxiNic is as the same as the poll mode. However, we won't submit the next buffer until the interrupt of previous transmition has been handled.
+```
+make DRIVER=axinet run TEST=transmit_line_speed_$(MODE) MTU=***
+```
 
-We set a interrupt threshold on DMA. DMA will trigger an interrupt only when the number of packets sent reaches the threshold. 
+```
+python receiver.py $(MTU)
+```
 
-## Rust Future + ATSINTC
+- MODE: poll / intr / atsintc.
+- MTU: The length of each ethernet package.
 
-The `ATSINTC` is the a interrupt controller integrated with asynchonrous task scheduling. When an interrupt occur, it will directly wake the interrupt handler task without breaking the execution of CPU.
+### [Transmit and receiver test](./src/transeiver/)
 
-This test case is the same as before, we will send package one by one. But we use the Rust `Future` and `ATSINTC`. The execution change is under the help of Rust compiler while the notification mechanism is provided by `ATSINTC`.
+There are only results in this directory. The [test code](https://github.com/ATS-INTC/baremetal/tree/main/driver-test/axinet/src/single_loop_test) is under another branch of this repository.
 
+### [Single loop test](./src/single_loop/)
+
+```
+make DRIVER=axinet run TEST=single_loop_$(MODE) MTU=*** SCALE=*** 
+```
+
+```
+python client.py $(MODE) $(MTU) $(SCALE)
+```
+
+- MODE: poll / intr / atsintc.
+- MTU: The length of each ethernet package.
+- SCALE: The size of the matrix(workload).
+
+### [single_tcp_test](./src/single_tcp/)
+
+```
+make DRIVER=axinet run TEST=single_tcp_$(MODE) SCALE=***
+```
+
+```
+python tcp_client.py $(MODE) $(SCALE)
+```
+
+- MODE: poll / intr / atsintc.
+- SCALE: The size of the matrix(workload).
+
+### [Network Protocal Stack test](./src/ns_ping/)
+
+```
+make DRIVER=axinet run TEST=ns_ping_$(MODE)
+```
+
+```
+python client.py $(MODE) $(COUNT)
+```
+
+- MODE: poll / intr / atsintc.
+- COUNT: The total number of ping request is `COUNT * 200`
+
+### [Multiple priority connections test](./src/prio_connect/)
+
+```
+make DRIVER=axinet run TEST=prio_connect SCALE=*** PRIO=*** CPN=***
+```
+
+```
+python tcp_client_prio.py $(SCALE) $(PRIO) $(CPN)
+```
+
+- SCALE: The size of the matrix(workload).
+- PRIO: The number of priority.
+- CPN: The connection number of each priority.

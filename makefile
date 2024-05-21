@@ -1,7 +1,7 @@
+DRIVER ?= 
 TEST ?= 
-FEATURES ?= 
 LOG := info
-TEST_DIR = driver-test
+DRIVER_DIR = driver-test
 TARGET_DIR = target/riscv64gc-unknown-none-elf
 MODE := release
 OPENSBI_DIR = opensbi
@@ -9,19 +9,19 @@ PLATFORM = axu15eg
 OPENSBI_OBJMK = $(OPENSBI_DIR)/platform/$(PLATFORM)/objects.mk
 FW_PAYLOAD = $(OPENSBI_DIR)/build/platform/$(PLATFORM)/firmware/fw_payload.bin
 
-ELF := $(TARGET_DIR)/$(MODE)/$(TEST)
-ASM := $(TARGET_DIR)/$(MODE)/$(TEST).asm
-BIN := $(TARGET_DIR)/$(MODE)/$(TEST).bin
+ELF := $(TARGET_DIR)/$(MODE)/$(DRIVER)
+ASM := $(TARGET_DIR)/$(MODE)/$(DRIVER).asm
+BIN := $(TARGET_DIR)/$(MODE)/$(DRIVER).bin
 
 
 OBJDUMP := rust-objdump --arch-name=riscv64
 OBJCOPY := rust-objcopy --binary-architecture=riscv64
 
 build:
-ifdef FEATURES
-	cd $(TEST_DIR)/$(TEST) && LOG=$(LOG) cargo build --$(MODE) --features $(FEATURES)
+ifdef TEST
+	cd $(DRIVER_DIR)/$(DRIVER) && LOG=$(LOG) cargo build --$(MODE) --features $(TEST)
 else
-	cd $(TEST_DIR)/$(TEST) && LOG=$(LOG) cargo build --$(MODE)
+	cd $(DRIVER_DIR)/$(DRIVER) && LOG=$(LOG) cargo build --$(MODE)
 endif
 	$(OBJCOPY) $(ELF) --strip-all -O binary $(BIN)
 
