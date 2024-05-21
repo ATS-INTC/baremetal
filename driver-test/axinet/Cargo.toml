@@ -64,4 +64,4 @@ single_loop_poll = []
 single_loop_intr = ["trap"]
 single_loop_atsintc = ["ats-intc", "axi-dma/async"]
 
-default = ["single_loop_atsintc"]
+default = []
