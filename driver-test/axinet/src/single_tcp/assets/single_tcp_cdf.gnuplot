@@ -1,4 +1,4 @@
-set terminal pdfcairo enhanced size 15in,6in font "Arial,24"
+set terminal pdfcairo enhanced size 15in,5in font "Arial,24"
 set output 'single_tcp_cdf.pdf'
 set boxwidth 1
 set grid ytics
@@ -53,7 +53,7 @@ set yrange [0: 0.08]
 set ytics 0.02
 set mytics 2
 set style fill transparent solid 0.8 border -1
-set key samplen 1 Right center bottom at graph 0.2, 0.5
+set key samplen 1 Right center bottom at graph 0.2, 0.4
 set xlabel 'Matrix Size = 1'
 datafile0 = 'atsintc1/atsintc_delay_freq.dat'
 datafile1 = 'poll1/poll_delay_freq.dat'
