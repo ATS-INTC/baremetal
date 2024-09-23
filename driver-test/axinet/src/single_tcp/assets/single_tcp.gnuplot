@@ -1,4 +1,4 @@
-set terminal pdfcairo enhanced size 8in,6in font "Arial,24"
+set terminal pdfcairo enhanced size 8in,5in font "Arial,24"
 set output 'single_tcp.pdf'
 fn(v) = sprintf("%.0f", v)
 compare(a, b) = a / b

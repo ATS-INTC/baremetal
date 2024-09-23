@@ -1,4 +1,4 @@
-set terminal pdfcairo enhanced size 8in,6in font "Arial,24"
+set terminal pdfcairo enhanced size 8in,5in font "Arial,24"
 set output 'single_workload.pdf'
 fn(v) = sprintf("%.0f", v)
 compare(a, b) = a / b
@@ -35,7 +35,7 @@ plot datafile using 2 with histogram title 'TAIC', '' \
 
 # 第二个小子图，嵌套在大图内
 set size 0.5, 0.4
-set origin 0.2, 0.5
+set origin 0.175, 0.45
 set object 1 rect from graph 0, 0 to graph 1, 1 behind
 set object 1 fc rgb "white" fillstyle solid 1.0 noborder
 
